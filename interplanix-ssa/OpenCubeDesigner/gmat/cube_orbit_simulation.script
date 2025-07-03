@@ -1,0 +1,32 @@
+%----------------------------------------
+% Orbit Simulation for 3U CubeSat in LEO
+%----------------------------------------
+
+% Create the spacecraft object
+Create Spacecraft CubeSat;
+CubeSat.DateFormat = UTCGregorian;
+CubeSat.Epoch = '01 Jan 2025 00:00:00.000';   % Start time of simulation
+CubeSat.OrbitColor = Red;
+CubeSat.X = 7000;       % km from Earth's center (position vector)
+CubeSat.Y = 0;
+CubeSat.Z = 0;
+CubeSat.VX = 0;
+CubeSat.VY = 7.5;        % km/s (velocity vector for near-circular LEO)
+CubeSat.VZ = 0;
+CubeSat.DryMass = 4;     % Approximate mass of 3U CubeSat in kg
+
+% Set up forces acting on the spacecraft
+Create ForceModel EarthForces;
+EarthForces.CentralBody = Earth;
+EarthForces.SRP = On;    % Enable solar radiation pressure
+EarthForces.Drag = On;   % Enable atmospheric drag
+
+% Define the propagator using Runge-Kutta89 method
+Create Propagator PropLEO;
+PropLEO.FM = EarthForces;
+PropLEO.Type = RungeKutta89;
+PropLEO.InitialStepSize = 60;   % Propagation time step (seconds)
+
+% Mission sequence: run the simulation for 7 days
+BeginMissionSequence;
+Propagate PropLEO(CubeSat) {CubeSat.ElapsedDays = 7};

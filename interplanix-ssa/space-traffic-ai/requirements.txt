@@ -1,0 +1,12 @@
+numpy
+scipy
+matplotlib
+pandas
+poliastro
+sgp4
+skyfield
+scikit-learn
+torch
+tensorflow
+gym
+stable-baselines3
