@@ -1,3 +1,0 @@
-skyfield
-pandas
-plotly
