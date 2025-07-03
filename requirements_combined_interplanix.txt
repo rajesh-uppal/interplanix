@@ -1,0 +1,70 @@
+
+# ===============================
+# Interplanix Combined Requirements
+# ===============================
+# This requirements.txt file combines dependencies across all active and planned Interplanix projects,
+# including SSA tools, missile dashboard, lunar terrain analysis, and future simulation tools.
+
+# --------------------------------
+# Core Scientific & Data Libraries
+# --------------------------------
+numpy
+pandas
+scipy
+matplotlib
+seaborn
+
+# --------------------------------
+# Machine Learning & AI
+# --------------------------------
+scikit-learn
+xgboost
+lightgbm
+tensorflow
+torch
+
+# --------------------------------
+# Jupyter and Notebook Tools
+# --------------------------------
+jupyter
+notebook
+jupyterlab
+
+# --------------------------------
+# Satellite Tracking and SSA
+# --------------------------------
+sgp4
+skyfield
+poliastro>=0.17
+
+
+# --------------------------------
+# GIS, Mapping & Terrain Analysis
+# --------------------------------
+rasterio
+geopandas
+shapely
+folium
+pyproj
+scikit-image
+
+# --------------------------------
+# Dashboards and Web Visualization
+# --------------------------------
+dash
+plotly
+flask
+
+# --------------------------------
+# DevOps, Linting, and Automation
+# --------------------------------
+black
+flake8
+ipykernel
+nbconvert
+
+# --------------------------------
+# Optional & Future Use
+# --------------------------------
+fastapi
+pyyaml
