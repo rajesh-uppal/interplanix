@@ -1,0 +1,4 @@
+norad_id,size_cm,mass_kg,source_event,material
+12345,10.2,5.3,Collision,Aluminum
+23456,2.5,0.3,Explosion,Composite
+34567,15.0,12.1,Anti-Sat Test,Titanium
