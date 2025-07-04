@@ -14,7 +14,8 @@ from dash import dcc, html
 import plotly.graph_objects as go
 
 # 📁 Load missile event data from JSON file
-DATA_FILE = os.path.join("..", "data", "missile_events.json")
+DATA_FILE = os.path.join(os.path.dirname(__file__), "data", "missile_events.json")
+
 
 # Open and parse the JSON data file
 with open(DATA_FILE, "r") as f:
