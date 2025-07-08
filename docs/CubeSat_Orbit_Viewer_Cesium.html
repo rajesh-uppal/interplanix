@@ -84,10 +84,13 @@
         leadTime: 60,
         trailTime: 3000
       },
-      ellipsoid: {
-        radii: new Cesium.Cartesian3(10000.0, 10000.0, 10000.0),
-        material: Cesium.Color.CYAN.withAlpha(0.7)
-      }
+   point: {
+  pixelSize: 10,
+  color: Cesium.Color.CYAN.withAlpha(0.8),
+  outlineColor: Cesium.Color.WHITE,
+  outlineWidth: 2
+  }
+
     });
 
     viewer.clock.startTime = start.clone();
