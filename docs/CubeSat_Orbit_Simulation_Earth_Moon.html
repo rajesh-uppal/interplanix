@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -47,8 +48,6 @@
   </p>
 
   <h2>📊 Define Your Orbit</h2>
-  <p>Choose central body and orbital parameters:</p>
-
   <label for="centralBody">🌍 Central Body:</label>
   <select id="centralBody" onchange="updateScript(); updateDefaults();">
     <option value="Earth">Earth</option>
@@ -70,16 +69,16 @@
 
   <h2>🧪 How It Works</h2>
   <ul>
-    <li><strong>SMA (Semi-Major Axis)</strong> = radius of central body + altitude</li>
+    <li><strong>SMA</strong> = Altitude + radius of Earth (6378 km) or Moon (1738 km)</li>
     <li><strong>ECC</strong> = 0 is circular, > 0 is elliptical</li>
-    <li><strong>INC</strong> controls the orbit tilt (0 = equatorial, 90 = polar)</li>
-    <li>Forces like drag and solar pressure are toggled depending on the body</li>
+    <li><strong>INC</strong> = Inclination angle (0° = equatorial, 90° = polar)</li>
+    <li><strong>SRP, Drag</strong> are enabled for Earth only (not Moon)</li>
   </ul>
 
-  <h2>🌐 Live Orbit Viewer (Earth)</h2>
+  <h2>🌐 Live Orbit Viewer (Earth Only)</h2>
   <iframe src="https://rajesh-uppal.github.io/interplanix/CubeSat_Orbit_Viewer_Cesium.html" allowfullscreen></iframe>
   <p style="font-size:small;">
-    View your orbit in 3D. Note: current viewer supports Earth visualization only.
+    Visualizes Earth orbits using CesiumJS. Moon simulation will work in GMAT only.
   </p>
 
   <script>
@@ -103,14 +102,13 @@
         document.getElementById("eccentricity").value = 0;
         document.getElementById("inclination").value = 51.6;
       }
-      updateScript();
     }
 
     function updateScript() {
       const body = document.getElementById("centralBody").value;
       const altitude = parseFloat(document.getElementById("altitude").value);
-      const ecc = document.getElementById("eccentricity").value;
-      const inc = document.getElementById("inclination").value;
+      const ecc = parseFloat(document.getElementById("eccentricity").value);
+      const inc = parseFloat(document.getElementById("inclination").value);
 
       const radius = (body === "Earth") ? 6378 : 1738;
       const sma = radius + altitude;
@@ -126,7 +124,7 @@ CubeSat.DragArea = 0.01;
 CubeSat.SRPArea = 0.01;
 CubeSat.OrbitColor = Red;
 
-CubeSat.SMA = ${sma};   % Altitude = ${altitude} km
+CubeSat.SMA = ${sma};   % ${altitude} km altitude
 CubeSat.ECC = ${ecc};
 CubeSat.INC = ${inc};
 CubeSat.RAAN = 0;
@@ -136,9 +134,9 @@ CubeSat.TA = 0;
 Create ForceModel OrbitForces;
 OrbitForces.CentralBody = ${body};
 OrbitForces.PrimaryBodies = {${body}};
-OrbitForces.SRP = ${body === 'Earth' ? 'On' : 'Off'};
-OrbitForces.Drag = ${body === 'Earth' ? 'On' : 'Off'};
-${body === 'Earth' ? 'OrbitForces.AtmosphereModel = MSISE90;' : ''}
+OrbitForces.SRP = ${body === "Earth" ? "On" : "Off"};
+OrbitForces.Drag = ${body === "Earth" ? "On" : "Off"};
+${body === "Earth" ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
 OrbitForces.GravityField.${body}.Degree = 4;
 OrbitForces.GravityField.${body}.Order = 4;
 
@@ -151,11 +149,14 @@ BeginMissionSequence;
 Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 7};`;
 
       document.getElementById("scriptDisplay").textContent = script;
-      const blob = new Blob([script], { type: 'text/plain' });
+      const blob = new Blob([script], { type: "text/plain" });
       document.getElementById("downloadLink").href = URL.createObjectURL(blob);
     }
 
-    document.addEventListener("DOMContentLoaded", updateScript);
+    document.addEventListener("DOMContentLoaded", () => {
+      updateDefaults();
+      updateScript();
+    });
   </script>
 </body>
 </html>
