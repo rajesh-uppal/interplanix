@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>🛰️ CubeSat Orbit Viewer</title>
+  <title>🛰️ CubeSat Orbit Viewer (CesiumJS)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
@@ -84,9 +84,9 @@
         leadTime: 60,
         trailTime: 3000
       },
-      model: {
-        uri: 'https://assets.agi.com/models/satellite.gltf',
-        scale: 5000
+      ellipsoid: {
+        radii: new Cesium.Cartesian3(10000.0, 10000.0, 10000.0),
+        material: Cesium.Color.CYAN.withAlpha(0.7)
       }
     });
 
