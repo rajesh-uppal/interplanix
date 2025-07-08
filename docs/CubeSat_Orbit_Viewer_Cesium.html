@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🛰️ CubeSat Orbit Viewer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
+  <style>
+    html, body { margin: 0; padding: 0; font-family: sans-serif; }
+    #cesiumContainer { width: 100%; height: 500px; }
+    .panel { padding: 20px; max-width: 800px; margin: auto; }
+    select, button { font-size: 16px; padding: 5px 10px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<div class="panel">
+  <h1>🛰️ CubeSat Orbit Viewer (CesiumJS)</h1>
+  <p>This live 3D viewer simulates a CubeSat orbit in real time. Choose an orbit type and click "Show Orbit".</p>
+
+  <label for="orbitSelect">Select Orbit:</label>
+  <select id="orbitSelect">
+    <option value="LEO">LEO (500 km)</option>
+    <option value="SSO">SSO (700 km)</option>
+    <option value="ELLIPTICAL">Elliptical (Molniya-like)</option>
+  </select>
+  <button onclick="loadOrbit()">🚀 Show Orbit</button>
+</div>
+
+<div id="cesiumContainer"></div>
+
+<script>
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    shouldAnimate: true,
+    timeline: true,
+    animation: true
+  });
+
+  let satelliteEntity = null;
+
+  function loadOrbit() {
+    if (satelliteEntity) viewer.entities.remove(satelliteEntity);
+
+    const now = Cesium.JulianDate.now();
+    const start = now;
+    const stop = Cesium.JulianDate.addDays(start, 1, new Cesium.JulianDate());
+
+    const mode = document.getElementById("orbitSelect").value;
+    let sma = 6878, ecc = 0, inc = 51.6;
+    if (mode === "SSO") {
+      sma = 7078; ecc = 0; inc = 98.6;
+    } else if (mode === "ELLIPTICAL") {
+      sma = 8000; ecc = 0.2; inc = 63.4;
+    }
+
+    const a = sma * 1000;
+    const inclination = Cesium.Math.toRadians(inc);
+    const e = ecc;
+    const n = Math.sqrt(398600.4418e9 / Math.pow(a, 3));
+    const period = 2 * Math.PI / n;
+
+    const positionsOverTime = new Cesium.SampledPositionProperty();
+    for (let t = 0; t <= period; t += 60) {
+      const M = n * t;
+      const E = M;
+      const x = a * (Math.cos(E) - e);
+      const y = a * Math.sqrt(1 - e * e) * Math.sin(E);
+      const z = 0;
+
+      const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
+      const position = new Cesium.Cartesian3(x * Math.cos(inclination), y, x * Math.sin(inclination));
+      positionsOverTime.addSample(time, position);
+    }
+
+    satelliteEntity = viewer.entities.add({
+      name: "CubeSat",
+      position: positionsOverTime,
+      orientation: new Cesium.VelocityOrientationProperty(positionsOverTime),
+      path: {
+        resolution: 120,
+        material: Cesium.Color.YELLOW,
+        width: 2,
+        leadTime: 60,
+        trailTime: 3000
+      },
+      model: {
+        uri: 'https://assets.agi.com/models/satellite.gltf',
+        scale: 5000
+      }
+    });
+
+    viewer.clock.startTime = start.clone();
+    viewer.clock.stopTime = stop.clone();
+    viewer.clock.currentTime = start.clone();
+    viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+    viewer.clock.clockStep = Cesium.ClockStep.SYSTEM_CLOCK_MULTIPLIER;
+    viewer.clock.multiplier = 50;
+    viewer.trackedEntity = satelliteEntity;
+  }
+
+  loadOrbit();
+</script>
+</body>
+</html>
