@@ -16,120 +16,109 @@
     }
     select, button, input {
       font-size: 1rem;
-      padding: 6px;
-      margin: 4px 0;
+      padding: 6px 10px;
+      margin-top: 8px;
+      margin-bottom: 8px;
     }
     pre {
       background: #f5f5f5;
       padding: 1em;
       overflow: auto;
     }
-    .section {
-      margin-top: 40px;
-    }
     iframe {
-      border-radius: 8px;
       width: 100%;
       height: 500px;
       border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+    @media (max-width: 600px) {
+      iframe {
+        height: 300px;
+      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Title and Description -->
   <h1>🛰️ CubeSat Orbit Simulation (Earth & Moon)</h1>
   <p>
-    This tool allows students, engineers, and mission designers to simulate CubeSat missions around either <strong>Earth</strong> or the <strong>Moon</strong> by generating GMAT-compatible orbit scripts based on custom inputs.
+    This simulation tool by <strong>Interplanix</strong> allows you to generate dynamic, GMAT-compatible orbit scripts
+    for CubeSats around Earth or Moon. You can also preview the orbit in a 3D viewer.
   </p>
 
-  <!-- Section 1: Orbit Parameter Input -->
-  <div class="section">
-    <h2>📊 1. Define Orbit Parameters</h2>
+  <h2>📊 Define Your Orbit</h2>
+  <p>Choose central body and orbital parameters:</p>
 
-    <!-- Choose central body (Earth or Moon) -->
-    <label for="centralBody">Central Body:</label>
-    <select id="centralBody" onchange="updateBodyDefaults()">
-      <option value="Earth">Earth</option>
-      <option value="Moon">Moon</option>
-    </select>
-    <br>
+  <label for="centralBody">🌍 Central Body:</label>
+  <select id="centralBody" onchange="updateScript(); updateDefaults();">
+    <option value="Earth">Earth</option>
+    <option value="Moon">Moon</option>
+  </select><br>
 
-    <!-- Set altitude in km -->
-    <label for="altitude">Altitude (km):</label>
-    <input type="number" id="altitude" value="500" />
-    <br>
+  <label for="altitude">📏 Altitude (km):</label>
+  <input type="number" id="altitude" value="500" onchange="updateScript()" /><br>
 
-    <!-- Set eccentricity -->
-    <label for="eccentricity">Eccentricity (ECC):</label>
-    <input type="number" step="0.01" id="eccentricity" value="0" />
-    <br>
+  <label for="eccentricity">🌀 Eccentricity (ECC):</label>
+  <input type="number" id="eccentricity" step="0.01" value="0" onchange="updateScript()" /><br>
 
-    <!-- Set inclination angle -->
-    <label for="inclination">Inclination (°):</label>
-    <input type="number" id="inclination" value="51.6" />
-    <br><br>
+  <label for="inclination">🧭 Inclination (°):</label>
+  <input type="number" id="inclination" step="0.1" value="51.6" onchange="updateScript()" /><br>
 
-    <!-- Button to generate and show GMAT script -->
-    <button onclick="toggleScript()">🧾 Show GMAT Script</button>
-    <!-- Hidden download link -->
-    <a id="downloadLink" href="#" download="cube_orbit_simulation.script" style="margin-left: 15px; display: none;">📥 Download Script</a>
+  <button onclick="toggleScript()">🧾 Show GMAT Script</button>
+  <a id="downloadLink" href="#" download="cube_orbit_simulation.script" style="display: none;">📥 Download Script</a>
+  <pre id="scriptDisplay" style="display:none;"></pre>
 
-    <!-- Script will appear here -->
-    <pre id="scriptDisplay" style="display:none;"></pre>
-  </div>
+  <h2>🧪 How It Works</h2>
+  <ul>
+    <li><strong>SMA (Semi-Major Axis)</strong> = radius of central body + altitude</li>
+    <li><strong>ECC</strong> = 0 is circular, > 0 is elliptical</li>
+    <li><strong>INC</strong> controls the orbit tilt (0 = equatorial, 90 = polar)</li>
+    <li>Forces like drag and solar pressure are toggled depending on the body</li>
+  </ul>
 
-  <!-- Section 2: Orbit Viewer (Earth only) -->
-  <div class="section">
-    <h2>🌐 2. Live Earth Orbit Visualization</h2>
-    <iframe src="https://rajesh-uppal.github.io/interplanix/CubeSat_Orbit_Viewer_Cesium.html" allowfullscreen></iframe>
-    <p style="font-size:small;">
-      This live 3D viewer currently supports Earth orbits only. For lunar orbit simulations, download the script and run it in <a href="https://gmatcentral.org" target="_blank">NASA GMAT</a>.
-    </p>
-  </div>
+  <h2>🌐 Live Orbit Viewer (Earth)</h2>
+  <iframe src="https://rajesh-uppal.github.io/interplanix/CubeSat_Orbit_Viewer_Cesium.html" allowfullscreen></iframe>
+  <p style="font-size:small;">
+    View your orbit in 3D. Note: current viewer supports Earth visualization only.
+  </p>
 
-  <!-- JavaScript Section for Logic -->
   <script>
     let scriptVisible = false;
 
-    // Show/hide the GMAT script output area
     function toggleScript() {
       scriptVisible = !scriptVisible;
       document.getElementById("scriptDisplay").style.display = scriptVisible ? "block" : "none";
       document.getElementById("downloadLink").style.display = scriptVisible ? "inline-block" : "none";
-      if (scriptVisible) updateScript();  // only update when showing
+      if (scriptVisible) updateScript();
     }
 
-    // Set default values when switching between Earth and Moon
-    function updateBodyDefaults() {
+    function updateDefaults() {
       const body = document.getElementById("centralBody").value;
-      if (body === "Earth") {
-        document.getElementById("altitude").value = 500;      // LEO
-        document.getElementById("eccentricity").value = 0;
-        document.getElementById("inclination").value = 51.6;
-      } else {
-        document.getElementById("altitude").value = 100;      // LLO
+      if (body === "Moon") {
+        document.getElementById("altitude").value = 100;
         document.getElementById("eccentricity").value = 0;
         document.getElementById("inclination").value = 90;
+      } else {
+        document.getElementById("altitude").value = 500;
+        document.getElementById("eccentricity").value = 0;
+        document.getElementById("inclination").value = 51.6;
       }
+      updateScript();
     }
 
-    // Generate the GMAT script dynamically
     function updateScript() {
       const body = document.getElementById("centralBody").value;
       const altitude = parseFloat(document.getElementById("altitude").value);
       const ecc = document.getElementById("eccentricity").value;
       const inc = document.getElementById("inclination").value;
 
-      // Earth radius = 6378 km, Moon radius = 1738 km
-      const bodyRadius = (body === "Earth") ? 6378 : 1738;
-      const sma = bodyRadius + altitude;
+      const radius = (body === "Earth") ? 6378 : 1738;
+      const sma = radius + altitude;
 
-      // Final GMAT script as string
       const script = `Create Spacecraft CubeSat;
+CubeSat.CentralBody = ${body};
 CubeSat.DateFormat = UTCGregorian;
 CubeSat.Epoch = '01 Jan 2025 00:00:00.000';
-CubeSat.CentralBody = ${body};
 CubeSat.DryMass = 4;
 CubeSat.Cd = 2.2;
 CubeSat.Cr = 1.8;
@@ -137,7 +126,7 @@ CubeSat.DragArea = 0.01;
 CubeSat.SRPArea = 0.01;
 CubeSat.OrbitColor = Red;
 
-CubeSat.SMA = ${sma};   % Body radius + altitude
+CubeSat.SMA = ${sma};   % Altitude = ${altitude} km
 CubeSat.ECC = ${ecc};
 CubeSat.INC = ${inc};
 CubeSat.RAAN = 0;
@@ -147,9 +136,9 @@ CubeSat.TA = 0;
 Create ForceModel OrbitForces;
 OrbitForces.CentralBody = ${body};
 OrbitForces.PrimaryBodies = {${body}};
-OrbitForces.SRP = ${body === "Moon" ? "Off" : "On"};
-OrbitForces.Drag = ${body === "Moon" ? "Off" : "On"};
-${body === "Earth" ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
+OrbitForces.SRP = ${body === 'Earth' ? 'On' : 'Off'};
+OrbitForces.Drag = ${body === 'Earth' ? 'On' : 'Off'};
+${body === 'Earth' ? 'OrbitForces.AtmosphereModel = MSISE90;' : ''}
 OrbitForces.GravityField.${body}.Degree = 4;
 OrbitForces.GravityField.${body}.Order = 4;
 
@@ -161,14 +150,12 @@ PropCube.InitialStepSize = 60;
 BeginMissionSequence;
 Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 7};`;
 
-      // Show script and make downloadable
       document.getElementById("scriptDisplay").textContent = script;
       const blob = new Blob([script], { type: 'text/plain' });
       document.getElementById("downloadLink").href = URL.createObjectURL(blob);
     }
 
-    // Load defaults when page first loads
-    document.addEventListener("DOMContentLoaded", updateBodyDefaults);
+    document.addEventListener("DOMContentLoaded", updateScript);
   </script>
 </body>
 </html>
