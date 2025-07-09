@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🛰️ CubeSat Orbit Simulation (Earth & Moon)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    label, select, input, button {
+      font-size: 1rem;
+      margin-top: 8px;
+      margin-bottom: 8px;
+      padding: 6px;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 1em;
+      overflow: auto;
+    }
+    iframe {
+      width: 100%;
+      height: 500px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-top: 12px;
+    }
+    @media (max-width: 600px) {
+      iframe {
+        height: 300px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🛰️ CubeSat Orbit Simulation (Earth & Moon)</h1>
+  <p>
+    This interactive page from <strong>Interplanix</strong> helps you:
+    <ul>
+      <li>🧮 Generate GMAT-compatible orbit scripts for Earth or Moon</li>
+      <li>🌐 Visualize Earth orbits in 3D using CesiumJS</li>
+      <li>📥 Download a complete `.script` file to simulate in GMAT</li>
+    </ul>
+  </p>
+
+  <hr>
+  <h2>📊 1. Define Your Orbit</h2>
+
+  <label for="centralBody">🌍 Central Body:</label>
+  <select id="centralBody" onchange="updateDefaults(); updateScript(); toggleViewer();">
+    <option value="Earth">Earth</option>
+    <option value="Moon">Moon</option>
+  </select><br>
+
+  <label for="altitude">📏 Altitude (km):</label>
+  <input type="number" id="altitude" value="500" onchange="updateScript()" /><br>
+
+  <label for="eccentricity">🌀 Eccentricity (ECC):</label>
+  <input type="number" id="eccentricity" step="0.01" value="0" onchange="updateScript()" /><br>
+
+  <label for="inclination">🧭 Inclination (°):</label>
+  <input type="number" id="inclination" step="0.1" value="51.6" onchange="updateScript()" /><br>
+
+  <button onclick="toggleScript()">🧾 Show GMAT Script</button>
+  <a id="downloadLink" href="#" download="cube_orbit_simulation.script" style="display: none;">📥 Download Script</a>
+  <pre id="scriptDisplay" style="display:none;"></pre>
+
+  <hr>
+  <h2>🧪 2. How It Works</h2>
+  <p>This page calculates orbital parameters based on your input:</p>
+  <ul>
+    <li><strong>SMA (Semi-Major Axis)</strong> = Altitude + radius (Earth = 6378 km, Moon = 1738 km)</li>
+    <li><strong>ECC</strong> = Eccentricity (0 = circular)</li>
+    <li><strong>INC</strong> = Inclination (0 = equator, 90 = polar)</li>
+    <li><strong>SRP / Drag</strong> = Only included for Earth orbits (not modeled around Moon)</li>
+  </ul>
+  <p>The generated script is compatible with <a href="https://gmatcentral.org/" target="_blank" rel="noopener">NASA GMAT</a>.</p>
+
+  <hr>
+  <h2>🌐 3. Live 3D Orbit Viewer (Earth Only)</h2>
+  <p id="viewerNote">
+    🌍 Earth orbits are visualized below using <strong>CesiumJS</strong>. Moon orbits must be simulated locally in GMAT.
+  </p>
+  <div id="viewerContainer">
+    <iframe src="https://rajesh-uppal.github.io/interplanix/CubeSat_Orbit_Viewer_Cesium.html"
+            allowfullscreen></iframe>
+  </div>
+
+  <script>
+    let scriptVisible = false;
+
+    // Toggle the display of the GMAT script panel
+    function toggleScript() {
+      scriptVisible = !scriptVisible;
+      document.getElementById("scriptDisplay").style.display = scriptVisible ? "block" : "none";
+      document.getElementById("downloadLink").style.display = scriptVisible ? "inline-block" : "none";
+      if (scriptVisible) updateScript();
+    }
+
+    // Update default input fields when switching between Earth/Moon
+    function updateDefaults() {
+      const body = document.getElementById("centralBody").value;
+      if (body === "Moon") {
+        document.getElementById("altitude").value = 100;
+        document.getElementById("eccentricity").value = 0;
+        document.getElementById("inclination").value = 90;
+      } else {
+        document.getElementById("altitude").value = 500;
+        document.getElementById("eccentricity").value = 0;
+        document.getElementById("inclination").value = 51.6;
+      }
+    }
+
+    // Dynamically generate GMAT script based on inputs
+    function updateScript() {
+      const body = document.getElementById("centralBody").value;
+      const alt = parseFloat(document.getElementById("altitude").value);
+      const ecc = parseFloat(document.getElementById("eccentricity").value);
+      const inc = parseFloat(document.getElementById("inclination").value);
+      const radius = body === "Earth" ? 6378 : 1738;
+      const sma = radius + alt;
+
+      const script = `Create Spacecraft CubeSat;
+CubeSat.CentralBody = ${body};
+CubeSat.DateFormat = UTCGregorian;
+CubeSat.Epoch = '01 Jan 2025 00:00:00.000';
+CubeSat.DryMass = 4;
+CubeSat.Cd = 2.2;
+CubeSat.Cr = 1.8;
+CubeSat.DragArea = 0.01;
+CubeSat.SRPArea = 0.01;
+CubeSat.OrbitColor = Red;
+
+CubeSat.SMA = ${sma};   % Altitude = ${alt} km
+CubeSat.ECC = ${ecc};
+CubeSat.INC = ${inc};
+CubeSat.RAAN = 0;
+CubeSat.AOP = 0;
+CubeSat.TA = 0;
+
+Create ForceModel OrbitForces;
+OrbitForces.CentralBody = ${body};
+OrbitForces.PrimaryBodies = {${body}};
+OrbitForces.SRP = ${body === "Earth" ? "On" : "Off"};
+OrbitForces.Drag = ${body === "Earth" ? "On" : "Off"};
+${body === "Earth" ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
+OrbitForces.GravityField.${body}.Degree = 4;
+OrbitForces.GravityField.${body}.Order = 4;
+
+Create Propagator PropCube;
+PropCube.FM = OrbitForces;
+PropCube.Type = RungeKutta89;
+PropCube.InitialStepSize = 60;
+
+BeginMissionSequence;
+Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 7};`;
+
+      document.getElementById("scriptDisplay").textContent = script;
+      const blob = new Blob([script], { type: 'text/plain' });
+      document.getElementById("downloadLink").href = URL.createObjectURL(blob);
+    }
+
+    // Toggle Cesium viewer visibility based on selected body
+    function toggleViewer() {
+      const body = document.getElementById("centralBody").value;
+      const viewer = document.getElementById("viewerContainer");
+      const note = document.getElementById("viewerNote");
+      if (body === "Earth") {
+        viewer.style.display = "block";
+        note.style.color = "black";
+      } else {
+        viewer.style.display = "none";
+        note.style.color = "red";
+        note.innerHTML = "🚫 Cesium visualization is only available for Earth orbits. Please run GMAT for Moon orbits.";
+      }
+    }
+
+    // Initialize on load
+    document.addEventListener("DOMContentLoaded", () => {
+      updateDefaults();
+      updateScript();
+      toggleViewer();
+    });
+  </script>
+</body>
+</html>
