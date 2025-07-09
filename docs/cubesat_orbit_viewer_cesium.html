@@ -106,7 +106,10 @@
     }
 
     // Auto-draw default orbit on load
-    window.onload = drawOrbit;
+    window.onload = () => {
+    setTimeout(drawOrbit, 500); // Allow Cesium to initialize
+    };
+
   </script>
 </body>
 </html>
