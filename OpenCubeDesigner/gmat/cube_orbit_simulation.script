@@ -1,0 +1,33 @@
+% GMAT Script: CubeSat Orbit Simulation
+Create Spacecraft CubeSat;
+CubeSat.DateFormat = UTCGregorian;
+CubeSat.Epoch = '01 Jan 2025 00:00:00.000';   % Launch date
+CubeSat.DryMass = 4;
+CubeSat.Cd = 2.2;
+CubeSat.Cr = 1.8;
+CubeSat.DragArea = 0.01;
+CubeSat.SRPArea = 0.01;
+
+% Orbit Parameters
+CubeSat.SMA = 6878;         % Altitude = SMA - Earth radius (~6378 km)
+CubeSat.ECC = 0;
+CubeSat.INC = 51.6;         % Inclination for ISS-like LEO
+CubeSat.RAAN = 0;
+CubeSat.AOP = 0;
+CubeSat.TA = 0;
+
+% Forces applied
+Create ForceModel EarthForces;
+EarthForces.CentralBody = Earth;
+EarthForces.PrimaryBodies = {Earth};
+EarthForces.SRP = On;
+EarthForces.Drag = On;
+
+% Numerical Propagator
+Create Propagator PropLEO;
+PropLEO.FM = EarthForces;
+PropLEO.Type = RungeKutta89;
+
+% Mission timeline
+BeginMissionSequence;
+Propagate PropLEO(CubeSat) {CubeSat.ElapsedDays = 7};
