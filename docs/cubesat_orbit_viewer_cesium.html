@@ -1,100 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>🛰️ CubeSat Orbit Viewer (CesiumJS)</title>
+  <meta charset="UTF-8" />
+  <title>CubeSat Orbit Viewer (CesiumJS)</title>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
   <style>
     html, body, #cesiumContainer {
-      margin: 0;
-      padding: 0;
-      height: 100%;
-      width: 100%;
+      width: 100%; height: 600px; margin: 0; padding: 0; overflow: hidden;
       font-family: sans-serif;
     }
-    #controls {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: white;
-      padding: 10px;
-      z-index: 1;
-      border-radius: 8px;
+    #ui {
+      position: absolute; top: 10px; left: 10px; z-index: 1000;
+      background: rgba(255, 255, 255, 0.8); padding: 10px; border-radius: 8px;
     }
   </style>
 </head>
 <body>
   <div id="cesiumContainer"></div>
-  <div id="controls">
-    <label for="orbitMode">Select Orbit:</label>
-    <select id="orbitMode">
+  <div id="ui">
+    <label for="orbitSelect">Select Orbit:</label>
+    <select id="orbitSelect">
       <option value="LEO">LEO (500 km)</option>
       <option value="SSO">SSO (700 km)</option>
-      <option value="ELLIPTICAL">Elliptical (Molniya)</option>
+      <option value="MOLNIYA">Molniya (Elliptical)</option>
     </select>
-    <button onclick="loadOrbit()">🚀 Show Orbit</button>
-    <p id="status" style="font-size: 0.9em;"></p>
+    <button onclick="drawOrbit()">🚀 Show Orbit</button>
   </div>
 
   <script>
-    const viewer = new Cesium.Viewer("cesiumContainer", {
-      shouldAnimate: true,
+    // Initialize Cesium Viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
       timeline: false,
       animation: false,
-      terrainProvider: Cesium.createWorldTerrain(),
+      shouldAnimate: true
     });
 
-    let satellite;
+    let satelliteEntity = null;
+    let orbitPath = null;
 
-    function loadOrbit() {
-      if (satellite) viewer.entities.remove(satellite);
+    function drawOrbit() {
+      const mode = document.getElementById("orbitSelect").value;
 
-      const mode = document.getElementById("orbitMode").value;
-      let altitude = 500, inclination = 51.6;
+      // Clear old orbit
+      if (satelliteEntity) viewer.entities.remove(satelliteEntity);
+      if (orbitPath) viewer.entities.remove(orbitPath);
+
+      // Set parameters based on orbit mode
+      let altitude = 500;
+      let inclination = 51.6;
+      let ecc = 0.0;
 
       if (mode === "SSO") {
         altitude = 700;
         inclination = 98.6;
-      } else if (mode === "ELLIPTICAL") {
-        altitude = 500;
+      } else if (mode === "MOLNIYA") {
+        altitude = 26500;
+        ecc = 0.7;
         inclination = 63.4;
       }
 
-      const start = Cesium.JulianDate.fromDate(new Date());
-      const stop = Cesium.JulianDate.addMinutes(start, 90, new Cesium.JulianDate());
+      const earthRadius = 6371; // in km
+      const sma = earthRadius + altitude;
 
-      viewer.clock.startTime = start.clone();
-      viewer.clock.stopTime = stop.clone();
-      viewer.clock.currentTime = start.clone();
-      viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
-      viewer.clock.multiplier = 60;
+      const positions = [];
+      const count = 360;
 
-      const property = new Cesium.SampledPositionProperty();
-
-      for (let i = 0; i <= 90; i += 1) {
-        const time = Cesium.JulianDate.addMinutes(start, i, new Cesium.JulianDate());
-        const lon = (i * 4) % 360;
-        const lat = inclination * Math.sin(i / 90 * Math.PI);
-        const pos = Cesium.Cartesian3.fromDegrees(lon, lat, altitude * 1000);
-        property.addSample(time, pos);
+      for (let i = 0; i < count; i++) {
+        const angle = Cesium.Math.toRadians(i);
+        const r = sma * (1 - ecc * ecc) / (1 + ecc * Math.cos(angle)); // Elliptical
+        const lat = Math.asin(Math.sin(angle) * Math.sin(Cesium.Math.toRadians(inclination)));
+        const lon = angle;
+        const cartesian = Cesium.Cartesian3.fromDegrees(
+          Cesium.Math.toDegrees(lon),
+          Cesium.Math.toDegrees(lat),
+          r * 1000 // in meters
+        );
+        positions.push(cartesian);
       }
 
-      satellite = viewer.entities.add({
-        position: property,
-        point: { pixelSize: 10, color: Cesium.Color.CYAN },
-        path: {
-          resolution: 60,
-          material: Cesium.Color.YELLOW,
-          width: 2
+      // Draw orbit path
+      orbitPath = viewer.entities.add({
+        polyline: {
+          positions: positions,
+          width: 2,
+          material: Cesium.Color.YELLOW
         }
       });
 
-      viewer.trackedEntity = satellite;
-      document.getElementById("status").innerText = `Orbit Viewer: Simulated ${mode} pass (${altitude} km altitude)`;
+      // Satellite dot
+      satelliteEntity = viewer.entities.add({
+        position: positions[0],
+        point: {
+          pixelSize: 10,
+          color: Cesium.Color.LIME
+        },
+        label: {
+          text: "CubeSat",
+          font: "14px sans-serif",
+          pixelOffset: new Cesium.Cartesian2(10, -10)
+        }
+      });
+
+      viewer.zoomTo(orbitPath);
     }
 
-    loadOrbit();
+    // Auto-draw default orbit on load
+    window.onload = drawOrbit;
   </script>
 </body>
 </html>
