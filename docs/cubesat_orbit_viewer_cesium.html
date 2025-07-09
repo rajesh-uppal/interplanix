@@ -2,12 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <title>🛰️ CubeSat Cesium Orbit Viewer</title>
+  <title>🛰️ CubeSat Orbit Viewer (CesiumJS)</title>
   <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
   <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
   <style>
     html, body, #cesiumContainer {
-      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
       font-family: sans-serif;
     }
     #controls {
@@ -16,52 +19,50 @@
       left: 10px;
       background: white;
       padding: 10px;
+      z-index: 1;
       border-radius: 8px;
-      z-index: 1000;
     }
   </style>
 </head>
 <body>
   <div id="cesiumContainer"></div>
   <div id="controls">
-    <label for="orbitMode">Orbit:</label>
-    <select id="orbitMode" onchange="loadOrbit()">
+    <label for="orbitMode">Select Orbit:</label>
+    <select id="orbitMode">
       <option value="LEO">LEO (500 km)</option>
       <option value="SSO">SSO (700 km)</option>
       <option value="ELLIPTICAL">Elliptical (Molniya)</option>
     </select>
     <button onclick="loadOrbit()">🚀 Show Orbit</button>
-    <div id="status" style="margin-top: 5px; font-size: 0.9em;"></div>
+    <p id="status" style="font-size: 0.9em;"></p>
   </div>
 
   <script>
-    const viewer = new Cesium.Viewer('cesiumContainer', {
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      shouldAnimate: true,
       timeline: false,
-      animation: false
+      animation: false,
+      terrainProvider: Cesium.createWorldTerrain(),
     });
 
-    let satelliteEntity = null;
+    let satellite;
 
     function loadOrbit() {
-      const mode = document.getElementById('orbitMode').value;
-      let altitude = 500, inclination = 51.6, ecc = 0.0;
+      if (satellite) viewer.entities.remove(satellite);
+
+      const mode = document.getElementById("orbitMode").value;
+      let altitude = 500, inclination = 51.6;
 
       if (mode === "SSO") {
         altitude = 700;
         inclination = 98.6;
       } else if (mode === "ELLIPTICAL") {
         altitude = 500;
-        ecc = 0.2;
         inclination = 63.4;
       }
 
-      const radiusEarth = 6371;
-      const sma = radiusEarth + altitude;
-      const periodSec = 2 * Math.PI * Math.sqrt(Math.pow(sma * 1000, 3) / 3.986e14);
-      const duration = 1.5 * 60 * 60; // simulate 1.5 hours
-
       const start = Cesium.JulianDate.fromDate(new Date());
-      const stop = Cesium.JulianDate.addSeconds(start, duration, new Cesium.JulianDate());
+      const stop = Cesium.JulianDate.addMinutes(start, 90, new Cesium.JulianDate());
 
       viewer.clock.startTime = start.clone();
       viewer.clock.stopTime = stop.clone();
@@ -69,35 +70,27 @@
       viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
       viewer.clock.multiplier = 60;
 
-      const positionProperty = new Cesium.SampledPositionProperty();
+      const property = new Cesium.SampledPositionProperty();
 
-      for (let t = 0; t < duration; t += 10) {
-        const time = Cesium.JulianDate.addSeconds(start, t, new Cesium.JulianDate());
-        const angle = 2 * Math.PI * t / periodSec;
-        const x = (sma * 1000) * Math.cos(angle);
-        const y = (sma * 1000) * Math.sin(angle);
-        const z = 0;
-        const pos = Cesium.Cartesian3.fromArray([x, y, z]);
-        positionProperty.addSample(time, pos);
+      for (let i = 0; i <= 90; i += 1) {
+        const time = Cesium.JulianDate.addMinutes(start, i, new Cesium.JulianDate());
+        const lon = (i * 4) % 360;
+        const lat = inclination * Math.sin(i / 90 * Math.PI);
+        const pos = Cesium.Cartesian3.fromDegrees(lon, lat, altitude * 1000);
+        property.addSample(time, pos);
       }
 
-      if (satelliteEntity) {
-        viewer.entities.remove(satelliteEntity);
-      }
-
-      satelliteEntity = viewer.entities.add({
-        id: "CubeSat",
-        name: "Simulated Orbit",
-        position: positionProperty,
+      satellite = viewer.entities.add({
+        position: property,
         point: { pixelSize: 10, color: Cesium.Color.CYAN },
         path: {
-          resolution: 120,
+          resolution: 60,
           material: Cesium.Color.YELLOW,
           width: 2
         }
       });
 
-      viewer.trackedEntity = satelliteEntity;
+      viewer.trackedEntity = satellite;
       document.getElementById("status").innerText = `Orbit Viewer: Simulated ${mode} pass (${altitude} km altitude)`;
     }
 
