@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛰️ CubeSat Orbit Viewer (CesiumJS)</title>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden;
+    }
+    #toolbar {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 100; background: white; padding: 10px; border-radius: 8px;
+      font-family: sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="toolbar">
+    <strong>Orbit Viewer:</strong> Simulated LEO pass (500 km altitude)
+  </div>
+  <div id="cesiumContainer"></div>
+
+  <script>
+    // Initialize the Cesium Viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+      shouldAnimate: true,
+      timeline: true,
+      animation: true,
+      baseLayerPicker: false,
+      terrainProvider: Cesium.createWorldTerrain()
+    });
+
+    // Add a simple satellite orbit at 500 km altitude (LEO)
+    const start = Cesium.JulianDate.fromDate(new Date());
+    const stop = Cesium.JulianDate.addSeconds(start, 5400, new Cesium.JulianDate()); // 90 min orbit
+
+    viewer.clock.startTime = start.clone();
+    viewer.clock.stopTime = stop.clone();
+    viewer.clock.currentTime = start.clone();
+    viewer.clock.clockRange = Cesium.ClockRange.LOOP_STOP;
+    viewer.clock.multiplier = 10;
+
+    const position = new Cesium.SampledPositionProperty();
+
+    for (let i = 0; i <= 5400; i += 60) {
+      const time = Cesium.JulianDate.addSeconds(start, i, new Cesium.JulianDate());
+      const angle = Cesium.Math.TWO_PI * (i / 5400);
+
+      // Generate a point at 500 km altitude orbiting Earth
+      const radius = 6878000; // in meters (Earth radius + 500 km)
+      const x = radius * Math.cos(angle);
+      const y = radius * Math.sin(angle);
+      const z = 0;
+
+      const pos = Cesium.Cartesian3.fromElements(x, y, z);
+      position.addSample(time, pos);
+    }
+
+    // Create satellite entity
+    const satellite = viewer.entities.add({
+      name: "CubeSat - LEO",
+      position: position,
+      point: { pixelSize: 8, color: Cesium.Color.RED, outlineColor: Cesium.Color.WHITE, outlineWidth: 2 },
+      path: {
+        resolution: 60,
+        material: Cesium.Color.YELLOW,
+        width: 2
+      }
+    });
+
+    viewer.trackedEntity = satellite; // camera will follow satellite
+  </script>
+</body>
+</html>
