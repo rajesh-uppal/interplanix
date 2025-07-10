@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🛰️ Extended CubeSat Orbit Simulation</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      max-width: 900px;
+      margin: auto;
+    }
+    label, select, input, button {
+      display: block;
+      margin: 10px 0;
+      font-size: 1rem;
+    }
+    pre {
+      background: #f5f5f5;
+      padding: 1em;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>🛰️ CubeSat Orbit Simulation (Earth, Moon, Mars, Sun, GTO)</h1>
+
+  <label for="centralBody">🌍 Central Body:</label>
+  <select id="centralBody" onchange="updateDefaults(); updateScript();">
+    <option value="Earth">Earth</option>
+    <option value="Moon">Moon</option>
+    <option value="Mars">Mars</option>
+    <option value="Sun">Sun</option>
+    <option value="GTO">GTO (Earth Transfer)</option>
+    <option value="Hohmann">Hohmann Transfer (Earth-Mars)</option>
+  </select>
+
+  <label for="altitude">📏 Altitude (km):</label>
+  <input type="number" id="altitude" value="500" onchange="updateScript()" />
+
+  <label for="eccentricity">🌀 Eccentricity (0 = circular):</label>
+  <input type="number" id="eccentricity" value="0" step="0.01" onchange="updateScript()" />
+
+  <label for="inclination">🧭 Inclination (degrees):</label>
+  <input type="number" id="inclination" value="51.6" step="0.1" onchange="updateScript()" />
+
+  <button onclick="toggleScript()">🧾 Show GMAT Script</button>
+  <a id="downloadLink" href="#" download="orbit_simulation.script" style="display: none;">📥 Download Script</a>
+  <pre id="scriptDisplay" style="display: none;"></pre>
+
+  <script>
+    let scriptVisible = false;
+
+    function toggleScript() {
+      scriptVisible = !scriptVisible;
+      document.getElementById("scriptDisplay").style.display = scriptVisible ? "block" : "none";
+      document.getElementById("downloadLink").style.display = scriptVisible ? "inline-block" : "none";
+      if (scriptVisible) updateScript();
+    }
+
+    function updateDefaults() {
+      const body = document.getElementById("centralBody").value;
+      const alt = document.getElementById("altitude");
+      const ecc = document.getElementById("eccentricity");
+      const inc = document.getElementById("inclination");
+
+      switch (body) {
+        case "Moon":
+          alt.value = 100; ecc.value = 0; inc.value = 90;
+          break;
+        case "Mars":
+          alt.value = 400; ecc.value = 0.01; inc.value = 25;
+          break;
+        case "Sun":
+          alt.value = 50000000; ecc.value = 0.0167; inc.value = 7.25;
+          break;
+        case "GTO":
+          alt.value = 35786; ecc.value = 0.72; inc.value = 0;
+          break;
+        case "Hohmann":
+          alt.value = 0; ecc.value = 0.5; inc.value = 0;
+          break;
+        default:
+          alt.value = 500; ecc.value = 0; inc.value = 51.6;
+      }
+    }
+
+    function updateScript() {
+      const body = document.getElementById("centralBody").value;
+      const alt = parseFloat(document.getElementById("altitude").value);
+      const ecc = parseFloat(document.getElementById("eccentricity").value);
+      const inc = parseFloat(document.getElementById("inclination").value);
+
+      const radii = {
+        Earth: 6378,
+        Moon: 1738,
+        Mars: 3396,
+        Sun: 695700,
+        GTO: 6378,
+        Hohmann: 6378
+      };
+
+      let sma = radii[body] + alt;
+      if (body === "Hohmann") {
+        sma = (radii["Earth"] + 149600000 + radii["Mars"]) / 2; // ~126 million km
+      }
+
+      let script = `Create Spacecraft CubeSat;
+CubeSat.CentralBody = ${body === "Hohmann" ? "Sun" : body};
+CubeSat.DateFormat = UTCGregorian;
+CubeSat.Epoch = '01 Jan 2026 00:00:00.000';
+CubeSat.DryMass = 5;
+CubeSat.Cd = 2.2;
+CubeSat.Cr = 1.8;
+CubeSat.DragArea = 0.02;
+CubeSat.SRPArea = 0.02;
+CubeSat.OrbitColor = Red;
+
+CubeSat.SMA = ${sma};   % Altitude: ${alt} km or special profile
+CubeSat.ECC = ${ecc};
+CubeSat.INC = ${inc};
+CubeSat.RAAN = 0;
+CubeSat.AOP = 0;
+CubeSat.TA = 0;
+
+Create ForceModel OrbitForces;
+OrbitForces.CentralBody = ${body === "Hohmann" ? "Sun" : body};
+OrbitForces.PrimaryBodies = {${body === "Hohmann" ? "Sun" : body}};
+OrbitForces.SRP = ${body === "Earth" || body === "Mars" ? "On" : "Off"};
+OrbitForces.Drag = ${body === "Earth" ? "On" : "Off"};
+${body === "Earth" ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
+OrbitForces.GravityField.${body === "Hohmann" ? "Sun" : body}.Degree = 4;
+OrbitForces.GravityField.${body === "Hohmann" ? "Sun" : body}.Order = 4;
+
+Create Propagator PropCube;
+PropCube.FM = OrbitForces;
+PropCube.Type = RungeKutta89;
+PropCube.InitialStepSize = 60;
+
+BeginMissionSequence;
+Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 20};`;
+
+      document.getElementById("scriptDisplay").textContent = script;
+      const blob = new Blob([script], { type: "text/plain" });
+      document.getElementById("downloadLink").href = URL.createObjectURL(blob);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateDefaults();
+      updateScript();
+    });
+  </script>
+</body>
+</html>
