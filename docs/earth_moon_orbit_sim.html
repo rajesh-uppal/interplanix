@@ -2,27 +2,27 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🛰️ CubeSat Orbit Simulation (Earth & Moon)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>🛰️ CubeSat Orbit Simulation (Earth, Moon, Mars, GTO)</title>
   <style>
     body {
       font-family: sans-serif;
-      padding: 20px;
       max-width: 900px;
       margin: auto;
+      padding: 20px;
     }
     h1, h2 {
       color: #2c3e50;
     }
     label, select, input, button {
-      margin: 6px 0;
+      display: block;
+      margin: 10px 0;
       font-size: 1rem;
-      padding: 5px;
     }
     pre {
       background: #f5f5f5;
       padding: 1em;
-      overflow: auto;
+      overflow-x: auto;
     }
     iframe {
       width: 100%;
@@ -30,53 +30,44 @@
       border-radius: 8px;
       border: 1px solid #ccc;
     }
-    @media (max-width: 600px) {
-      iframe {
-        height: 300px;
-      }
+    .note {
+      font-size: 0.9rem;
+      color: #555;
     }
   </style>
 </head>
 <body>
-  <h1>🛰️ CubeSat Orbit Simulation (Earth & Moon)</h1>
+  <h1>🛰️ CubeSat Orbit Simulation (Earth, Moon, Mars, GTO)</h1>
   <p>
-    This interactive tool by <strong>Interplanix</strong> lets you simulate CubeSat missions around the Earth or Moon using GMAT-compatible scripts.
-    You can preview, download, and run these orbits in GMAT, with a live Cesium viewer for Earth cases.
+    Generate dynamic <strong>GMAT scripts</strong> for CubeSat orbit simulation around Earth, Moon, Mars, or GTO. Visualize Earth orbits with CesiumJS and download ready-to-run mission plans.
   </p>
 
-  <h2>📊 1. Select Orbital Parameters</h2>
+  <h2>📊 Define Orbit Parameters</h2>
+
   <label for="centralBody">🌍 Central Body:</label>
   <select id="centralBody" onchange="updateDefaults(); updateScript();">
     <option value="Earth">Earth</option>
     <option value="Moon">Moon</option>
-  </select><br>
+    <option value="Mars">Mars</option>
+    <option value="GTO">Geostationary Transfer Orbit (Earth)</option>
+  </select>
 
   <label for="altitude">📏 Altitude (km):</label>
-  <input type="number" id="altitude" value="500" onchange="updateScript()" /><br>
+  <input type="number" id="altitude" value="500" onchange="updateScript()" />
 
-  <label for="eccentricity">🌀 Eccentricity (ECC):</label>
-  <input type="number" id="eccentricity" step="0.01" value="0" onchange="updateScript()" /><br>
+  <label for="eccentricity">🌀 Eccentricity (0 = circular):</label>
+  <input type="number" id="eccentricity" value="0" step="0.01" onchange="updateScript()" />
 
-  <label for="inclination">🧭 Inclination (°):</label>
-  <input type="number" id="inclination" step="0.1" value="51.6" onchange="updateScript()" /><br>
+  <label for="inclination">🧭 Inclination (degrees):</label>
+  <input type="number" id="inclination" value="51.6" step="0.1" onchange="updateScript()" />
 
   <button onclick="toggleScript()">🧾 Show GMAT Script</button>
-  <a id="downloadLink" href="#" download="cube_orbit_simulation.script" style="display:none;">📥 Download Script</a>
-  <pre id="scriptDisplay" style="display:none;"></pre>
+  <a id="downloadLink" href="#" download="cube_orbit_simulation.script" style="display: none;">📥 Download Script</a>
+  <pre id="scriptDisplay" style="display: none;"></pre>
 
-  <h2>🧪 2. How It Works</h2>
-  <ul>
-    <li><strong>SMA</strong> = Altitude + radius of Earth (6378 km) or Moon (1738 km)</li>
-    <li><strong>ECC</strong>: Eccentricity (0 = circular, >0 = elliptical)</li>
-    <li><strong>INC</strong>: Inclination angle</li>
-    <li><strong>SRP/Drag</strong>: Enabled for Earth, disabled for Moon</li>
-  </ul>
-
-  <h2>🌐 3. Live 3D Orbit Viewer (Earth Only)</h2>
+  <h2>🌐 Live Orbit Viewer (Earth Only)</h2>
   <iframe src="https://rajesh-uppal.github.io/interplanix/cubesat_orbit_viewer_cesium.html" allowfullscreen></iframe>
-  <p style="font-size:small;">
-    This Cesium-based viewer displays Earth orbits. For Moon orbits, download and simulate using <a href="https://gmatcentral.org/" target="_blank">NASA GMAT</a>.
-  </p>
+  <p class="note">Viewer currently supports Earth orbits only. For Mars, Moon or GTO, use GMAT locally.</p>
 
   <script>
     let scriptVisible = false;
@@ -88,13 +79,20 @@
       if (scriptVisible) updateScript();
     }
 
-    // Set defaults based on central body
     function updateDefaults() {
       const body = document.getElementById("centralBody").value;
       if (body === "Moon") {
         document.getElementById("altitude").value = 100;
         document.getElementById("eccentricity").value = 0;
         document.getElementById("inclination").value = 90;
+      } else if (body === "Mars") {
+        document.getElementById("altitude").value = 400;
+        document.getElementById("eccentricity").value = 0.01;
+        document.getElementById("inclination").value = 45;
+      } else if (body === "GTO") {
+        document.getElementById("altitude").value = 35786;  // apogee-like altitude
+        document.getElementById("eccentricity").value = 0.72;
+        document.getElementById("inclination").value = 0;
       } else {
         document.getElementById("altitude").value = 500;
         document.getElementById("eccentricity").value = 0;
@@ -102,20 +100,24 @@
       }
     }
 
-    // Update GMAT script content
     function updateScript() {
       const body = document.getElementById("centralBody").value;
       const alt = parseFloat(document.getElementById("altitude").value);
       const ecc = parseFloat(document.getElementById("eccentricity").value);
       const inc = parseFloat(document.getElementById("inclination").value);
 
-      const radius = (body === "Earth") ? 6378 : 1738;
-      const sma = radius + alt;
+      const radius = {
+        Earth: 6378,
+        Moon: 1738,
+        Mars: 3396
+      };
 
-      const isEarth = body === "Earth";
+      // Determine SMA
+      let sma = radius[body] + alt;
+      let central = body === "GTO" ? "Earth" : body;
 
       const script = `Create Spacecraft CubeSat;
-CubeSat.CentralBody = ${body};
+CubeSat.CentralBody = ${central};
 CubeSat.DateFormat = UTCGregorian;
 CubeSat.Epoch = '01 Jan 2025 00:00:00.000';
 CubeSat.DryMass = 4;
@@ -125,7 +127,7 @@ CubeSat.DragArea = 0.01;
 CubeSat.SRPArea = 0.01;
 CubeSat.OrbitColor = Red;
 
-CubeSat.SMA = ${sma};   % ${alt} km altitude
+CubeSat.SMA = ${sma};   % Altitude: ${alt} km
 CubeSat.ECC = ${ecc};
 CubeSat.INC = ${inc};
 CubeSat.RAAN = 0;
@@ -133,13 +135,13 @@ CubeSat.AOP = 0;
 CubeSat.TA = 0;
 
 Create ForceModel OrbitForces;
-OrbitForces.CentralBody = ${body};
-OrbitForces.PrimaryBodies = {${body}};
-OrbitForces.SRP = ${isEarth ? "On" : "Off"};
-OrbitForces.Drag = ${isEarth ? "On" : "Off"};
-${isEarth ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
-OrbitForces.GravityField.${body}.Degree = 4;
-OrbitForces.GravityField.${body}.Order = 4;
+OrbitForces.CentralBody = ${central};
+OrbitForces.PrimaryBodies = {${central}};
+OrbitForces.SRP = ${central === "Earth" ? "On" : "Off"};
+OrbitForces.Drag = ${central === "Earth" ? "On" : "Off"};
+${central === "Earth" ? "OrbitForces.AtmosphereModel = MSISE90;" : ""}
+OrbitForces.GravityField.${central}.Degree = 4;
+OrbitForces.GravityField.${central}.Order = 4;
 
 Create Propagator PropCube;
 PropCube.FM = OrbitForces;
@@ -154,7 +156,6 @@ Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 7};`;
       document.getElementById("downloadLink").href = URL.createObjectURL(blob);
     }
 
-    // Initialize on load
     document.addEventListener("DOMContentLoaded", () => {
       updateDefaults();
       updateScript();
