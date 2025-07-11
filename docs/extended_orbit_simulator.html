@@ -1,75 +1,99 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>🛰️ Extended Orbit Simulator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🛰️ CubeSat Orbit Simulation: Earth, Moon, Mars & Beyond</title>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.109/Build/Cesium/Widgets/widgets.css" rel="stylesheet" />
   <style>
     body {
-      font-family: sans-serif;
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
+      font-family: "Segoe UI", sans-serif;
+      margin: 0;
+      padding: 0;
+      line-height: 1.6;
+      background: #f5f5f5;
     }
-    h1, h2 {
-      color: #2c3e50;
+    header {
+      padding: 1em;
+      text-align: center;
+      background: #003366;
+      color: white;
+    }
+    main {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 0 20px;
     }
     label, select, input, button {
       display: block;
-      margin: 10px 0;
+      margin: 12px 0;
       font-size: 1rem;
-    }
-    pre {
-      background: #f5f5f5;
-      padding: 1em;
-      overflow-x: auto;
-      white-space: pre-wrap;
-    }
-    iframe {
       width: 100%;
-      height: 500px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      max-width: 400px;
     }
-    .note {
-      font-size: 0.9rem;
-      color: #555;
+    #scriptDisplay {
+      background: #eee;
+      padding: 10px;
+      white-space: pre-wrap;
+      display: none;
+    }
+    #downloadLink {
+      display: none;
+      margin: 10px 0;
+      font-size: 0.95rem;
+    }
+    #cesiumContainer {
+      height: 600px;
+      width: 100%;
+      margin-top: 30px;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    @media (max-width: 600px) {
+      #cesiumContainer {
+        height: 400px;
+      }
     }
   </style>
 </head>
 <body>
-  <h1>🛰️ CubeSat Orbit Simulation: Earth, Moon, Mars & GTO</h1>
-  <p>
-    This extended simulator by <strong>Interplanix</strong> allows you to generate GMAT-compatible orbit scripts for CubeSats around Earth, Moon, Mars, or in GTO and interplanetary space. Earth orbits are also visualized in 3D below using CesiumJS.
-  </p>
+  <header>
+    <h1>🛰️ Extended Orbit Simulator (Earth, Moon, Mars, GTO)</h1>
+    <p>Visualize and generate GMAT-compatible CubeSat orbit scripts in CesiumJS.</p>
+  </header>
 
-  <h2>📊 1. Orbit Inputs</h2>
-  <label for="centralBody">🌍 Central Body:</label>
-  <select id="centralBody" onchange="updateDefaults(); updateScript();">
-    <option value="Earth">Earth</option>
-    <option value="Moon">Moon</option>
-    <option value="Mars">Mars</option>
-    <option value="GTO">Geostationary Transfer Orbit</option>
-    <option value="Interplanetary">Interplanetary</option>
-  </select>
+  <main>
+    <label>🌍 Central Body:
+      <select id="centralBody" onchange="updateDefaults(); updateScript();">
+        <option>Earth</option>
+        <option>Moon</option>
+        <option>Mars</option>
+        <option>GTO</option>
+        <option>Interplanetary</option>
+      </select>
+    </label>
 
-  <label for="altitude">📏 Altitude (km):</label>
-  <input type="number" id="altitude" value="500" onchange="updateScript()" />
+    <label>📏 Altitude (km):
+      <input type="number" id="altitude" value="500" onchange="updateScript()" />
+    </label>
 
-  <label for="eccentricity">🌀 Eccentricity (0 = circular):</label>
-  <input type="number" id="eccentricity" value="0" step="0.01" onchange="updateScript()" />
+    <label>🌀 Eccentricity:
+      <input type="number" id="eccentricity" value="0" step="0.01" onchange="updateScript()" />
+    </label>
 
-  <label for="inclination">🧭 Inclination (degrees):</label>
-  <input type="number" id="inclination" value="51.6" step="0.1" onchange="updateScript()" />
+    <label>🧭 Inclination (deg):
+      <input type="number" id="inclination" value="51.6" step="0.1" onchange="updateScript()" />
+    </label>
 
-  <button onclick="toggleScript()">🧾 Show GMAT Script</button>
-  <a id="downloadLink" href="#" download="cubesat_orbit_simulation.script" style="display: none;">📥 Download Script</a>
-  <pre id="scriptDisplay" style="display: none;"></pre>
+    <button onclick="toggleScript()">🧾 Show GMAT Script</button>
+    <a id="downloadLink" href="#" download="orbit.script">📥 Download Script</a>
+    <pre id="scriptDisplay"></pre>
 
-  <h2>🌐 2. 3D Orbit Viewer (Earth Only)</h2>
-  <iframe src="https://rajesh-uppal.github.io/interplanix/cubesat_orbit_viewer_cesium.html" allowfullscreen></iframe>
-  <p class="note">🌍 CesiumJS visualizes Earth orbits. Use GMAT to simulate Moon, Mars, GTO, and interplanetary orbits.</p>
+    <h2>🌐 3D Cesium Orbit Viewer</h2>
+    <div id="cesiumContainer"></div>
+    <p style="font-size: 0.9em; color: #555;">Note: Viewer is Earth-only. For Moon/Mars use GMAT.</p>
+  </main>
 
   <script>
     let scriptVisible = false;
@@ -77,18 +101,15 @@
     function toggleScript() {
       scriptVisible = !scriptVisible;
       document.getElementById("scriptDisplay").style.display = scriptVisible ? "block" : "none";
-      document.getElementById("downloadLink").style.display = scriptVisible ? "inline-block" : "none";
+      document.getElementById("downloadLink").style.display = scriptVisible ? "block" : "none";
       if (scriptVisible) updateScript();
     }
 
     function updateDefaults() {
       const body = document.getElementById("centralBody").value;
-      const alt = (body === "Moon") ? 100 : (body === "Mars" ? 400 : (body === "GTO" ? 35786 : 500));
-      const ecc = (body === "GTO") ? 0.72 : 0;
-      const inc = (body === "Moon") ? 90 : 51.6;
-      document.getElementById("altitude").value = alt;
-      document.getElementById("eccentricity").value = ecc;
-      document.getElementById("inclination").value = inc;
+      document.getElementById("altitude").value = body === "Moon" ? 100 : (body === "Mars" ? 250 : 500);
+      document.getElementById("eccentricity").value = 0;
+      document.getElementById("inclination").value = body === "Moon" ? 90 : 51.6;
     }
 
     function updateScript() {
@@ -97,13 +118,8 @@
       const ecc = parseFloat(document.getElementById("eccentricity").value);
       const inc = parseFloat(document.getElementById("inclination").value);
 
-      let radius = 6378;
-      if (body === "Moon") radius = 1738;
-      else if (body === "Mars") radius = 3390;
-      else if (body === "GTO") radius = 6378;
-      else if (body === "Interplanetary") radius = 6378;
-
-      const sma = radius + alt;
+      const radius = body === "Earth" ? 6378 : (body === "Moon" ? 1738 : (body === "Mars" ? 3396 : 6378));
+      const sma = body === "GTO" ? 42164 : (body === "Interplanetary" ? 100000 : radius + alt);
 
       const script = `Create Spacecraft CubeSat;
 CubeSat.CentralBody = ${body};
@@ -116,7 +132,7 @@ CubeSat.DragArea = 0.01;
 CubeSat.SRPArea = 0.01;
 CubeSat.OrbitColor = Red;
 
-CubeSat.SMA = ${sma};   % Altitude: ${alt} km
+CubeSat.SMA = ${sma};
 CubeSat.ECC = ${ecc};
 CubeSat.INC = ${inc};
 CubeSat.RAAN = 0;
@@ -145,10 +161,38 @@ Propagate PropCube(CubeSat) {CubeSat.ElapsedDays = 7};`;
       document.getElementById("downloadLink").href = URL.createObjectURL(blob);
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
+    // === Cesium Viewer (Earth only) ===
+    let viewer;
+    window.addEventListener("DOMContentLoaded", () => {
       updateDefaults();
       updateScript();
+
+      // Delay Cesium init to allow page layout to stabilize
+      setTimeout(() => {
+        viewer = new Cesium.Viewer("cesiumContainer", {
+          shouldAnimate: true,
+          timeline: false,
+          animation: false,
+        });
+
+        const sat = viewer.entities.add({
+          name: "CubeSat",
+          position: Cesium.Cartesian3.fromDegrees(0, 0, 6878000),
+          point: {
+            pixelSize: 10,
+            color: Cesium.Color.GREEN,
+            outlineColor: Cesium.Color.WHITE,
+            outlineWidth: 2,
+          },
+        });
+
+        viewer.trackedEntity = sat;
+        viewer.scene.camera.flyTo({
+          destination: Cesium.Cartesian3.fromDegrees(0, 0, 25000000),
+        });
+      }, 500);
     });
   </script>
 </body>
 </html>
+git add docs/extended_orbit_simulator.html
