@@ -69,27 +69,30 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
-function createLabel(text, color) {
+function createLabel(text) {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 64;
+    canvas.width = 512;
+    canvas.height = 128;
     const ctx = canvas.getContext('2d');
 
-    // Background for better visibility
-    ctx.fillStyle = "black";
+    // Background box
+    ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Draw text
-    ctx.font = 'bold 28px Arial';
+    // White bold text
+    ctx.font = 'bold 48px Arial';
     ctx.fillStyle = 'white';
-    ctx.fillText(text, 10, 40);
+    ctx.fillText(text, 20, 80);
 
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(3, 0.75, 1);
+
+    // Fixed readable size
+    sprite.scale.set(4, 1, 1);  // Width, Height, Depth
     return sprite;
 }
+
 
 
 planetData.forEach(data => {
@@ -97,8 +100,10 @@ planetData.forEach(data => {
     const material = new THREE.MeshBasicMaterial({ color: data.color });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = data.dist;
-    const label = createLabel(data.name, data.color);
-    label.position.set(data.dist, data.size + 0.5, 0);
+    
+    const label = createLabel(data.name);
+    label.position.set(data.dist, data.size + 0.8, 0); // Raised higher for visibility
+   
     mesh.userData = data;
     label.userData = data;
     scene.add(mesh);
