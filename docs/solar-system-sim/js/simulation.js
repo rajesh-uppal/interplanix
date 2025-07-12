@@ -1,21 +1,19 @@
-// Interplanix Solar System Simulation with Labels, Info Panel, Reset View, and Clock
+// Interplanix Solar System Simulation with Readable Labels, Info Box, Clock, and Reset Button
+
 let scene = new THREE.Scene();
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
 let timeDays = 0;
 const clockDisplay = document.createElement('div');
-clockDisplay.style.background = 'rgba(255, 255, 255, 0.15)';
-clockDisplay.style.color = 'white';
-infoBox.style.border = '1px solid #ccc'; 
 clockDisplay.style.position = 'absolute';
 clockDisplay.style.top = '20px';
 clockDisplay.style.right = '20px';
 clockDisplay.style.color = 'white';
 clockDisplay.style.fontSize = '16px';
-clockDisplay.style.background = 'rgba(0,0,0,0.6)';
+clockDisplay.style.background = 'rgba(255,255,255,0.1)';
 clockDisplay.style.padding = '8px';
 clockDisplay.style.borderRadius = '8px';
 clockDisplay.style.zIndex = 1000;
@@ -25,8 +23,9 @@ const infoBox = document.createElement('div');
 infoBox.style.position = 'absolute';
 infoBox.style.top = '70px';
 infoBox.style.left = '20px';
-infoBox.style.background = 'rgba(0,0,0,0.7)';
+infoBox.style.background = 'rgba(0,0,0,0.85)';
 infoBox.style.color = 'white';
+infoBox.style.border = '1px solid #ccc';
 infoBox.style.padding = '10px';
 infoBox.style.borderRadius = '8px';
 infoBox.style.display = 'none';
@@ -48,7 +47,7 @@ resetBtn.style.zIndex = 1000;
 document.body.appendChild(resetBtn);
 resetBtn.onclick = () => camera.position.set(0, 0, 35);
 
-let sun = new THREE.Mesh(
+const sun = new THREE.Mesh(
     new THREE.SphereGeometry(2, 32, 32),
     new THREE.MeshBasicMaterial({ color: 0xffff00 })
 );
@@ -69,46 +68,47 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
+// 🆕 Improved label rendering: high-res canvas, white text, fixed size
 function createLabel(text) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
     canvas.height = 128;
     const ctx = canvas.getContext('2d');
-
-    // Background box
     ctx.fillStyle = 'black';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    // White bold text
     ctx.font = 'bold 48px Arial';
     ctx.fillStyle = 'white';
     ctx.fillText(text, 20, 80);
-
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
-
-    // Fixed readable size
-    sprite.scale.set(4, 1, 1);  // Width, Height, Depth
+    sprite.scale.set(4, 1.2, 1);
     return sprite;
 }
-
-
 
 planetData.forEach(data => {
     const geometry = new THREE.SphereGeometry(data.size, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: data.color });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = data.dist;
-    
+
     const label = createLabel(data.name);
-    label.position.set(data.dist, data.size + 0.8, 0); // Raised higher for visibility
-   
+    label.position.set(data.dist, data.size + 0.8, 0);
+
     mesh.userData = data;
     label.userData = data;
+
     scene.add(mesh);
     scene.add(label);
-    planets.push({ mesh, label, angle: Math.random() * Math.PI * 2, speed: data.speed, dist: data.dist, size: data.size });
+
+    planets.push({
+        mesh,
+        label,
+        angle: Math.random() * Math.PI * 2,
+        speed: data.speed,
+        dist: data.dist,
+        size: data.size
+    });
 });
 
 camera.position.z = 35;
@@ -117,14 +117,16 @@ function animate() {
     requestAnimationFrame(animate);
     timeDays += 1;
     clockDisplay.innerText = `🕒 Sim Time: ${timeDays} Earth days`;
+
     planets.forEach(p => {
         p.angle += p.speed;
         const x = Math.cos(p.angle) * p.dist;
         const z = Math.sin(p.angle) * p.dist;
         p.mesh.position.set(x, 0, z);
-        p.label.position.set(x, p.size + 0.5, z);
+        p.label.position.set(x, p.size + 0.8, z);
         p.label.lookAt(camera.position);
     });
+
     renderer.render(scene, camera);
 }
 animate();
