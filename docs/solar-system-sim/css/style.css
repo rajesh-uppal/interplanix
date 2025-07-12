@@ -1,0 +1,13 @@
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: black;
+  color: white;
+  text-align: center;
+}
+#container {
+  width: 100vw;
+  height: 90vh;
+  display: block;
+}
