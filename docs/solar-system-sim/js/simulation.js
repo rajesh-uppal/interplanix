@@ -10,7 +10,7 @@ document.getElementById('container').appendChild(renderer.domElement);
 let timeDays = 0;
 const clockDisplay = document.createElement('div');
 clockDisplay.style.position = 'absolute';
-clockDisplay.style.top = '20px';
+clockDisplay.style.bottom = '20px';
 clockDisplay.style.right = '20px';
 clockDisplay.style.color = 'white';
 clockDisplay.style.fontSize = '16px';
@@ -71,7 +71,6 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
-// 🆕 Improved label rendering: high-res canvas, white text, fixed size
 function createLabel(text) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
