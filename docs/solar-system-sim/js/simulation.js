@@ -7,6 +7,9 @@ document.getElementById('container').appendChild(renderer.domElement);
 
 let timeDays = 0;
 const clockDisplay = document.createElement('div');
+clockDisplay.style.background = 'rgba(255, 255, 255, 0.15)';
+clockDisplay.style.color = 'white';
+infoBox.style.border = '1px solid #ccc'; 
 clockDisplay.style.position = 'absolute';
 clockDisplay.style.top = '20px';
 clockDisplay.style.right = '20px';
@@ -68,18 +71,26 @@ let mouse = new THREE.Vector2();
 
 function createLabel(text, color) {
     const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
     canvas.width = 256;
     canvas.height = 64;
-    ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
-    ctx.font = '28px Arial';
+    const ctx = canvas.getContext('2d');
+
+    // Background for better visibility
+    ctx.fillStyle = "black";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Draw text
+    ctx.font = 'bold 28px Arial';
+    ctx.fillStyle = 'white';
     ctx.fillText(text, 10, 40);
+
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
-    sprite.scale.set(2, 0.5, 1);
+    sprite.scale.set(3, 0.75, 1);
     return sprite;
 }
+
 
 planetData.forEach(data => {
     const geometry = new THREE.SphereGeometry(data.size, 32, 32);
