@@ -1,13 +1,26 @@
+// Interplanix Solar System Simulation with Labels, Info Panel, Reset View, and Clock
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
-// Info Panel
+let timeDays = 0;
+const clockDisplay = document.createElement('div');
+clockDisplay.style.position = 'absolute';
+clockDisplay.style.top = '20px';
+clockDisplay.style.right = '20px';
+clockDisplay.style.color = 'white';
+clockDisplay.style.fontSize = '16px';
+clockDisplay.style.background = 'rgba(0,0,0,0.6)';
+clockDisplay.style.padding = '8px';
+clockDisplay.style.borderRadius = '8px';
+clockDisplay.style.zIndex = 1000;
+document.body.appendChild(clockDisplay);
+
 const infoBox = document.createElement('div');
 infoBox.style.position = 'absolute';
-infoBox.style.top = '20px';
+infoBox.style.top = '70px';
 infoBox.style.left = '20px';
 infoBox.style.background = 'rgba(0,0,0,0.7)';
 infoBox.style.color = 'white';
@@ -17,14 +30,27 @@ infoBox.style.display = 'none';
 infoBox.style.zIndex = 1000;
 document.body.appendChild(infoBox);
 
-// Sun
-const sun = new THREE.Mesh(
+const resetBtn = document.createElement('button');
+resetBtn.textContent = "🔄 Reset View";
+resetBtn.style.position = 'absolute';
+resetBtn.style.bottom = '20px';
+resetBtn.style.left = '20px';
+resetBtn.style.padding = '10px 16px';
+resetBtn.style.background = '#444';
+resetBtn.style.color = 'white';
+resetBtn.style.border = 'none';
+resetBtn.style.borderRadius = '6px';
+resetBtn.style.cursor = 'pointer';
+resetBtn.style.zIndex = 1000;
+document.body.appendChild(resetBtn);
+resetBtn.onclick = () => camera.position.set(0, 0, 35);
+
+let sun = new THREE.Mesh(
     new THREE.SphereGeometry(2, 32, 32),
     new THREE.MeshBasicMaterial({ color: 0xffff00 })
 );
 scene.add(sun);
 
-// Planet data
 const planetData = [
   { name: 'Mercury', color: 0xaaaaaa, dist: 4, size: 0.2, speed: 0.04, orbit: 88, moons: 0 },
   { name: 'Venus', color: 0xffaa00, dist: 6, size: 0.3, speed: 0.015, orbit: 225, moons: 0 },
@@ -40,7 +66,6 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
-// Label helper
 function createLabel(text, color) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
@@ -49,7 +74,6 @@ function createLabel(text, color) {
     ctx.fillStyle = '#' + color.toString(16).padStart(6, '0');
     ctx.font = '28px Arial';
     ctx.fillText(text, 10, 40);
-
     const texture = new THREE.CanvasTexture(canvas);
     const material = new THREE.SpriteMaterial({ map: texture });
     const sprite = new THREE.Sprite(material);
@@ -57,39 +81,26 @@ function createLabel(text, color) {
     return sprite;
 }
 
-// Build planets and labels
 planetData.forEach(data => {
     const geometry = new THREE.SphereGeometry(data.size, 32, 32);
     const material = new THREE.MeshBasicMaterial({ color: data.color });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.x = data.dist;
-
-    // Label
     const label = createLabel(data.name, data.color);
     label.position.set(data.dist, data.size + 0.5, 0);
-
-    // Group planet + label
     mesh.userData = data;
     label.userData = data;
-
     scene.add(mesh);
     scene.add(label);
-
-    planets.push({
-        mesh,
-        label,
-        angle: Math.random() * Math.PI * 2,
-        speed: data.speed,
-        dist: data.dist,
-        size: data.size
-    });
+    planets.push({ mesh, label, angle: Math.random() * Math.PI * 2, speed: data.speed, dist: data.dist, size: data.size });
 });
 
 camera.position.z = 35;
 
-// Animation
 function animate() {
     requestAnimationFrame(animate);
+    timeDays += 1;
+    clockDisplay.innerText = `🕒 Sim Time: ${timeDays} Earth days`;
     planets.forEach(p => {
         p.angle += p.speed;
         const x = Math.cos(p.angle) * p.dist;
@@ -102,12 +113,10 @@ function animate() {
 }
 animate();
 
-// Handle click
 window.addEventListener('click', (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     raycaster.setFromCamera(mouse, camera);
-
     const intersects = raycaster.intersectObjects(planets.map(p => p.mesh).concat(planets.map(p => p.label)));
     if (intersects.length > 0) {
         const data = intersects[0].object.userData;
