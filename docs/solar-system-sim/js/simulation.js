@@ -1,4 +1,5 @@
 // Interplanix Solar System Simulation with Readable Labels, Info Box, Clock, and Reset Button
+console.log("✅ simulation.js v3 loaded");
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -20,6 +21,8 @@ clockDisplay.style.zIndex = 1000;
 document.body.appendChild(clockDisplay);
 
 const infoBox = document.createElement('div');
+console.log("✅ infoBox created");
+
 infoBox.style.position = 'absolute';
 infoBox.style.top = '70px';
 infoBox.style.left = '20px';
