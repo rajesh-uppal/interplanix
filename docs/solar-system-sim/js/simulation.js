@@ -78,9 +78,10 @@ document.body.appendChild(resetViewBtn);
 const resetSimBtn = document.createElement("button");
 resetSimBtn.textContent = "🔄 Reset Simulation";
 Object.assign(resetSimBtn.style, {
-  position: "fixed",
-  bottom: "100px",        // was 60px
-  left: "20px",
+position: "fixed",
+  bottom: "20px",
+  left: "50%",
+  transform: "translateX(-50%)",
   background: "#800",
   color: "white",
   padding: "10px 16px",
