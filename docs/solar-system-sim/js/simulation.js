@@ -62,8 +62,8 @@ Object.assign(resetViewBtn.style, {
   zIndex: 9999
 });
 resetViewBtn.onclick = () => {
-  camera.position.set(0, 0, 35);
-  camera.lookAt(0, 0, 0);
+ camera.position.set(0, 4, 35);  // ↑ Y-axis is now slightly raised
+ camera.lookAt(0, 0, 0);         // Still look at the Sun at center
   if (lastClickedPlanetData) {
     const d = lastClickedPlanetData;
     infoBox.innerHTML = `<strong>${d.name}</strong><br>
