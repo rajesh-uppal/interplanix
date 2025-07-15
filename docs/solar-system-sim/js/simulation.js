@@ -34,7 +34,7 @@ document.body.appendChild(clockDisplay);
 const infoBox = document.createElement("div");
 Object.assign(infoBox.style, {
   position: "fixed",
-  bottom: "70px",
+  bottom: "80px",
   left: "20px",
   background: "rgba(0,0,0,0.85)",
   color: "white",
@@ -51,7 +51,7 @@ const resetViewBtn = document.createElement("button");
 resetViewBtn.textContent = "🔁 Reset View";
 Object.assign(resetViewBtn.style, {
   position: "fixed",
-  bottom: "60px",         // was 20px
+  bottom: "20px",
   left: "20px",
   background: "#444",
   color: "white",
