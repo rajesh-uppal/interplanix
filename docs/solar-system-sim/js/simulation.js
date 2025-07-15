@@ -66,20 +66,20 @@ resetBtn.onclick = () => {
 document.body.appendChild(resetBtn);
 
 const sun = new THREE.Mesh(
-  new THREE.SphereGeometry(2, 32, 32),
+  new THREE.SphereGeometry(8, 32, 32),
   new THREE.MeshBasicMaterial({ color: 0xffff00 })
 );
 scene.add(sun);
 
 const planetData = [
-  { name: "Mercury", color: 0xaaaaaa, dist: 4, size: 0.20, speed: 0.040, orbit: 88, moons: 0 },
-  { name: "Venus",   color: 0xffaa00, dist: 6, size: 0.30, speed: 0.015, orbit: 225, moons: 0 },
-  { name: "Earth",   color: 0x00aaff, dist: 8, size: 0.35, speed: 0.010, orbit: 365, moons: 1 },
-  { name: "Mars",    color: 0xff3300, dist: 10, size: 0.25, speed: 0.008, orbit: 687, moons: 2 },
-  { name: "Jupiter", color: 0xffcc99, dist: 14, size: 0.90, speed: 0.002, orbit: 4333, moons: 95 },
-  { name: "Saturn",  color: 0xffffcc, dist: 18, size: 0.70, speed: 0.0015, orbit: 10759, moons: 145 },
-  { name: "Uranus",  color: 0x99ccff, dist: 22, size: 0.50, speed: 0.001, orbit: 30687, moons: 27 },
-  { name: "Neptune", color: 0x3366ff, dist: 26, size: 0.50, speed: 0.0009, orbit: 60190, moons: 14 }
+  { name: "Mercury", color: 0xaaaaaa, dist: 4, size: 0.40, speed: 0.040, orbit: 88, moons: 0 },
+  { name: "Venus",   color: 0xffaa00, dist: 6, size: 0.60, speed: 0.015, orbit: 225, moons: 0 },
+  { name: "Earth",   color: 0x00aaff, dist: 8, size: 0.70, speed: 0.010, orbit: 365, moons: 1 },
+  { name: "Mars",    color: 0xff3300, dist: 10, size: 0.50, speed: 0.008, orbit: 687, moons: 2 },
+  { name: "Jupiter", color: 0xffcc99, dist: 14, size: 1.80, speed: 0.002, orbit: 4333, moons: 95 },
+  { name: "Saturn",  color: 0xffffcc, dist: 18, size: 1.40, speed: 0.0015, orbit: 10759, moons: 145 },
+  { name: "Uranus",  color: 0x99ccff, dist: 22, size: 1.00, speed: 0.001, orbit: 30687, moons: 27 },
+  { name: "Neptune", color: 0x3366ff, dist: 26, size: 1.00, speed: 0.0009, orbit: 60190, moons: 14 }
 ];
 
 const planets = [];
