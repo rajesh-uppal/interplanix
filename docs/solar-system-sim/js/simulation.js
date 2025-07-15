@@ -1,3 +1,4 @@
+
 console.log("✅ simulation.js FINAL loaded");
 
 const container = document.getElementById("container");
@@ -14,6 +15,8 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 container.appendChild(renderer.domElement);
 
 let timeDays = 0;
+let lastClickedPlanetData = null;
+
 const clockDisplay = document.createElement("div");
 Object.assign(clockDisplay.style, {
   position: "fixed",
@@ -44,9 +47,9 @@ Object.assign(infoBox.style, {
 });
 document.body.appendChild(infoBox);
 
-const resetBtn = document.createElement("button");
-resetBtn.textContent = "🔄 Reset View";
-Object.assign(resetBtn.style, {
+const resetViewBtn = document.createElement("button");
+resetViewBtn.textContent = "🔁 Reset View";
+Object.assign(resetViewBtn.style, {
   position: "fixed",
   bottom: "20px",
   left: "20px",
@@ -58,17 +61,52 @@ Object.assign(resetBtn.style, {
   cursor: "pointer",
   zIndex: 9999
 });
-resetBtn.onclick = () => {
+resetViewBtn.onclick = () => {
   camera.position.set(0, 0, 35);
   camera.lookAt(0, 0, 0);
-  console.log("🔄 Reset view triggered");
+  if (lastClickedPlanetData) {
+    const d = lastClickedPlanetData;
+    infoBox.innerHTML = `<strong>${d.name}</strong><br>
+                         Distance from Sun: ${d.dist} AU<br>
+                         Orbital Period: ${d.orbit} days<br>
+                         Moons: ${d.moons}`;
+    infoBox.style.display = "block";
+  }
 };
-document.body.appendChild(resetBtn);
+document.body.appendChild(resetViewBtn);
 
+const resetSimBtn = document.createElement("button");
+resetSimBtn.textContent = "🔄 Reset Simulation";
+Object.assign(resetSimBtn.style, {
+  position: "fixed",
+  bottom: "60px",
+  left: "20px",
+  background: "#800",
+  color: "white",
+  padding: "10px 16px",
+  border: "none",
+  borderRadius: "6px",
+  cursor: "pointer",
+  zIndex: 9999
+});
+resetSimBtn.onclick = () => {
+  timeDays = 0;
+  infoBox.style.display = "none";
+  lastClickedPlanetData = null;
+  planets.forEach(p => {
+    p.angle = Math.random() * Math.PI * 2;
+  });
+  camera.position.set(0, 0, 35);
+  camera.lookAt(0, 0, 0);
+};
+document.body.appendChild(resetSimBtn);
+
+// 🌞 Sun Setup
 const sun = new THREE.Mesh(
-  new THREE.SphereGeometry(8, 32, 32),
-  new THREE.MeshBasicMaterial({ color: 0xffff00 })
+  new THREE.SphereGeometry(4, 32, 32),
+  new THREE.MeshBasicMaterial({ color: 0xffdd55 })
 );
+sun.userData = { name: "Sun" };
 scene.add(sun);
 
 const planetData = [
@@ -140,21 +178,37 @@ function animate() {
 }
 animate();
 
+// 🌞 Sun + Planets Click Interaction
 window.addEventListener("click", event => {
   const rect = renderer.domElement.getBoundingClientRect();
   mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
   raycaster.setFromCamera(mouse, camera);
-  const hits = raycaster.intersectObjects(planets.flatMap(p => [p.mesh, p.label]));
+  const hits = raycaster.intersectObjects(
+    [sun, ...planets.flatMap(p => [p.mesh, p.label])]
+  );
+
   if (hits.length > 0) {
-    const d = hits[0].object.userData;
-    infoBox.innerHTML = `<strong>${d.name}</strong><br>
-                         Distance from Sun: ${d.dist} AU<br>
-                         Orbital Period: ${d.orbit} days<br>
-                         Moons: ${d.moons}`;
+    const obj = hits[0].object;
+    const d = obj.userData;
+
+    if (obj === sun) {
+      lastClickedPlanetData = null;
+      infoBox.innerHTML = `<strong>Sun ☀️</strong><br>
+                           Type: G-type Main Sequence Star<br>
+                           Diameter: ~1.39 million km<br>
+                           Surface Temp: ~5,500°C<br>
+                           Age: ~4.6 billion years`;
+    } else {
+      lastClickedPlanetData = d;
+      infoBox.innerHTML = `<strong>${d.name}</strong><br>
+                           Distance from Sun: ${d.dist} AU<br>
+                           Orbital Period: ${d.orbit} days<br>
+                           Moons: ${d.moons}`;
+    }
+
     infoBox.style.display = "block";
-    console.log("🪐 Clicked:", d.name);
   } else {
     infoBox.style.display = "none";
   }
