@@ -51,7 +51,7 @@ const resetViewBtn = document.createElement("button");
 resetViewBtn.textContent = "🔁 Reset View";
 Object.assign(resetViewBtn.style, {
   position: "fixed",
-  bottom: "20px",
+  bottom: "60px",         // was 20px
   left: "20px",
   background: "#444",
   color: "white",
@@ -79,7 +79,7 @@ const resetSimBtn = document.createElement("button");
 resetSimBtn.textContent = "🔄 Reset Simulation";
 Object.assign(resetSimBtn.style, {
   position: "fixed",
-  bottom: "60px",
+  bottom: "100px",        // was 60px
   left: "20px",
   background: "#800",
   color: "white",
