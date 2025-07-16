@@ -1,5 +1,5 @@
-// Interplanix Solar System Simulation FINAL — compact time, mobile clean
-console.log("✅ FINAL SIMULATION LOADED");
+// Interplanix Solar System Simulation FINAL with readable labels & click info
+console.log("✅ FINAL SIMULATION WITH LABELS & INFO");
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -9,18 +9,15 @@ document.getElementById('container').appendChild(renderer.domElement);
 
 let timeDays = 0;
 
-// Clock Display (shortened)
 const clockDisplay = document.createElement('div');
 clockDisplay.id = "clockDisplay";
 clockDisplay.innerText = "🕒 0d";
 document.body.appendChild(clockDisplay);
 
-// Info box
 const infoBox = document.createElement('div');
 infoBox.id = "infoBox";
 document.body.appendChild(infoBox);
 
-// Reset View Button (desktop only)
 const resetViewBtn = document.createElement('button');
 resetViewBtn.id = "resetViewBtn";
 resetViewBtn.className = "ui-button";
@@ -28,7 +25,6 @@ resetViewBtn.textContent = "🔄 Reset View";
 resetViewBtn.onclick = () => camera.position.set(0, 0, 35);
 document.body.appendChild(resetViewBtn);
 
-// Reset Sim Button (desktop only)
 const resetSimBtn = document.createElement('button');
 resetSimBtn.id = "resetSimBtn";
 resetSimBtn.className = "ui-button";
@@ -40,7 +36,6 @@ resetSimBtn.onclick = () => {
 };
 document.body.appendChild(resetSimBtn);
 
-// Hide controls on mobile
 if (window.innerWidth < 600) {
   resetViewBtn.style.display = "none";
   resetSimBtn.style.display = "none";
@@ -49,7 +44,7 @@ if (window.innerWidth < 600) {
 
 const sun = new THREE.Mesh(
     new THREE.SphereGeometry(4, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xffe066 }) // lighter sun
+    new THREE.MeshBasicMaterial({ color: 0xffe066 })
 );
 scene.add(sun);
 
@@ -69,95 +64,97 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
 function createLabel(text) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
-    const ctx = canvas.getContext('2d');
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    ctx.font = 'bold 48px Arial';
-    ctx.fillStyle = 'white';
-    ctx.fillText(text, 20, 80);
-    const texture = new THREE.CanvasTexture(canvas);
-    const material = new THREE.SpriteMaterial({ map: texture });
-    const sprite = new THREE.Sprite(material);
-    sprite.scale.set(4, 1.2, 1);
-    return sprite;
+  const canvas = document.createElement('canvas');
+  canvas.width = 1024;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'black';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.font = 'bold 64px Arial';
+  ctx.fillStyle = 'white';
+  ctx.fillText(text, 40, 150);
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.SpriteMaterial({ map: texture });
+  const sprite = new THREE.Sprite(material);
+  sprite.scale.set(8, 2.5, 1);
+  return sprite;
 }
 
-// Sun Label
+// Add Sun label
 const sunLabel = createLabel("Sun");
 sunLabel.position.set(0, 5, 0);
 sunLabel.userData = {
-    name: "Sun",
-    dist: 0,
-    orbit: "N/A",
-    moons: "N/A"
+  name: "Sun",
+  dist: 0,
+  orbit: "N/A",
+  moons: "N/A"
 };
 scene.add(sunLabel);
 
+// Add planets
 planetData.forEach(data => {
-    const geometry = new THREE.SphereGeometry(data.size, 32, 32);
-    const material = new THREE.MeshBasicMaterial({ color: data.color });
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.position.x = data.dist;
+  const geometry = new THREE.SphereGeometry(data.size, 32, 32);
+  const material = new THREE.MeshBasicMaterial({ color: data.color });
+  const mesh = new THREE.Mesh(geometry, material);
+  mesh.position.x = data.dist;
 
-    const label = createLabel(data.name);
-    label.position.set(data.dist, data.size + 0.8, 0);
+  const label = createLabel(data.name);
+  label.position.set(data.dist, data.size + 0.8, 0);
 
-    mesh.userData = data;
-    label.userData = data;
+  mesh.userData = data;
+  label.userData = data;
 
-    scene.add(mesh);
-    scene.add(label);
+  scene.add(mesh);
+  scene.add(label);
 
-    planets.push({
-        mesh,
-        label,
-        angle: Math.random() * Math.PI * 2,
-        speed: data.speed,
-        dist: data.dist,
-        size: data.size
-    });
+  planets.push({
+    mesh,
+    label,
+    angle: Math.random() * Math.PI * 2,
+    speed: data.speed,
+    dist: data.dist,
+    size: data.size
+  });
 });
 
 camera.position.z = 40;
 
 function animate() {
-    requestAnimationFrame(animate);
-    timeDays += 1;
-    clockDisplay.innerText = `🕒 ${timeDays}d`;
+  requestAnimationFrame(animate);
+  timeDays += 1;
+  clockDisplay.innerText = `🕒 ${timeDays}d`;
 
-    planets.forEach(p => {
-        p.angle += p.speed;
-        const x = Math.cos(p.angle) * p.dist;
-        const z = Math.sin(p.angle) * p.dist;
-        p.mesh.position.set(x, 0, z);
-        p.label.position.set(x, p.size + 0.8, z);
-        p.label.lookAt(camera.position);
-    });
+  planets.forEach(p => {
+    p.angle += p.speed;
+    const x = Math.cos(p.angle) * p.dist;
+    const z = Math.sin(p.angle) * p.dist;
+    p.mesh.position.set(x, 0, z);
+    p.label.position.set(x, p.size + 0.8, z);
+    p.label.lookAt(camera.position);
+  });
 
-    sunLabel.lookAt(camera.position);
-    renderer.render(scene, camera);
+  sunLabel.lookAt(camera.position);
+  renderer.render(scene, camera);
 }
 animate();
 
-// Interactions
 window.addEventListener('click', (event) => {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(planets.map(p => p.mesh).concat(planets.map(p => p.label)).concat([sunLabel]));
-    if (intersects.length > 0) {
-        const data = intersects[0].object.userData;
-        if (window.innerWidth > 600) {
-            infoBox.innerHTML = `<strong>${data.name}</strong><br>
-                                 Distance from Sun: ${data.dist} AU<br>
-                                 Orbital Period: ${data.orbit} days<br>
-                                 Moons: ${data.moons}`;
-            infoBox.style.display = 'block';
-        }
-    } else {
-        infoBox.style.display = 'none';
+  mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  raycaster.setFromCamera(mouse, camera);
+  const intersects = raycaster.intersectObjects(
+    planets.map(p => p.mesh).concat(planets.map(p => p.label)).concat([sunLabel])
+  );
+  if (intersects.length > 0) {
+    const data = intersects[0].object.userData;
+    if (window.innerWidth > 600 && data && data.name) {
+      infoBox.innerHTML = `<strong>${data.name}</strong><br>
+                           Distance from Sun: ${data.dist} AU<br>
+                           Orbital Period: ${data.orbit} days<br>
+                           Moons: ${data.moons}`;
+      infoBox.style.display = 'block';
     }
+  } else {
+    infoBox.style.display = 'none';
+  }
 });
