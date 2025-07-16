@@ -1,5 +1,6 @@
-// Interplanix Solar System Simulation v23 - Final label tuning
-console.log("✅ SIMULATION v23 LOADED");
+
+// Interplanix Solar System Simulation v24 - Bold labels with outline
+console.log("✅ SIMULATION v24 LOADED");
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -48,7 +49,8 @@ const sun = new THREE.Mesh(
 );
 scene.add(sun);
 
-// 🌍 Planet data
+const isMobile = window.innerWidth <= 600;
+
 const planetData = [
   { name: 'Mercury', color: 0xaaaaaa, dist: 4, size: 0.4, speed: 0.04, orbit: 88, moons: 0 },
   { name: 'Venus', color: 0xffaa00, dist: 6, size: 0.6, speed: 0.015, orbit: 225, moons: 0 },
@@ -84,9 +86,14 @@ function createLabel(text, size = 1) {
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   ctx.font = `bold ${baseFontSize}px Arial`;
-  ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'black';
+  ctx.strokeText(text, canvasWidth / 2, canvasHeight / 2);
+
+  ctx.fillStyle = 'white';
   ctx.fillText(text, canvasWidth / 2, canvasHeight / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -107,12 +114,14 @@ sunLabel.userData = {
 scene.add(sunLabel);
 
 planetData.forEach(data => {
-  const geometry = new THREE.SphereGeometry(data.size, 32, 32);
+  const planetSize = isMobile ? data.size * 2 : data.size;
+  const geometry = new THREE.SphereGeometry(planetSize, 32, 32);
   const material = new THREE.MeshBasicMaterial({ color: data.color });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.x = data.dist;
+  mesh.userData = { ...data, size: planetSize };
 
-  const label = createLabel(data.name, data.size);
+  const label = createLabel(data.name, planetSize);
   label.position.set(data.dist, data.size + 0.8, 0);
 
   mesh.userData = data;
@@ -123,6 +132,7 @@ planetData.forEach(data => {
 
   planets.push({
     mesh,
+    size: planetSize,
     label,
     angle: Math.random() * Math.PI * 2,
     speed: data.speed,
