@@ -1,4 +1,3 @@
-
 html, body {
   margin: 0;
   padding: 0;
@@ -12,43 +11,78 @@ html, body {
 #container {
   width: 100vw;
   height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
 }
 
-/* Ensure buttons and info box scale well on mobile */
+/* Base styling for buttons */
+.ui-button {
+  position: fixed;
+  background: #444;
+  color: white;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  z-index: 9999;
+  font-size: 14px;
+}
+
+/* Specific positions */
+#resetViewBtn {
+  bottom: 20px;
+  left: 20px;
+}
+
+#resetSimBtn {
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #800;
+}
+
+#clockDisplay {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255,255,255,0.12);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 9999;
+}
+
+#infoBox {
+  position: fixed;
+  bottom: 80px;
+  left: 20px;
+  background: rgba(0,0,0,0.85);
+  color: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+  max-width: 240px;
+  z-index: 9999;
+  display: none;
+}
+
+/* 📱 Mobile Optimization */
 @media (max-width: 600px) {
   .ui-button {
-    position: fixed;
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: 90%;
     max-width: 280px;
-    text-align: center;
   }
 
   #resetViewBtn {
-    bottom: 20px !important;
+    bottom: 70px !important;
   }
 
   #resetSimBtn {
-    bottom: 80px !important;
+    bottom: 20px !important;
   }
 
   #infoBox {
-    bottom: 140px !important;
-    left: 10px !important;
-    right: 10px !important;
-    max-width: none;
-    font-size: 14px;
-  }
-
-  #clockDisplay {
-    bottom: 160px !important;
-    right: 10px !important;
-    font-size: 14px;
-  }
-}
+    bottom: 140px !i
