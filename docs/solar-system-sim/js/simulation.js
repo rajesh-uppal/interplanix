@@ -64,18 +64,26 @@ let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
 function createLabel(text) {
-  const canvas = document.createElement('canvas');
   const isMobile = window.innerWidth <= 600;
 
-  canvas.width = isMobile ? 512 : 1024;
-  canvas.height = isMobile ? 128 : 256;
+  const fontSize = isMobile ? 28 : 64;
+  const padding = 20;
+  const textWidth = text.length * fontSize * 0.6;
+  const canvasWidth = textWidth + padding * 2;
+  const canvasHeight = fontSize + padding * 2;
+
+  const canvas = document.createElement('canvas');
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
 
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'black';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.font = isMobile ? 'bold 28px Arial' : 'bold 64px Arial';
+  ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+  ctx.font = `bold ${fontSize}px Arial`;
   ctx.fillStyle = 'white';
-  ctx.fillText(text, 30, isMobile ? 80 : 150);
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, canvasWidth / 2, canvasHeight / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.SpriteMaterial({ map: texture });
