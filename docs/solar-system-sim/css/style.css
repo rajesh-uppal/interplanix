@@ -1,3 +1,4 @@
+
 html, body {
   margin: 0;
   padding: 0;
@@ -15,7 +16,7 @@ html, body {
   overflow: hidden;
 }
 
-/* Base styling for buttons */
+/* Base UI button style */
 .ui-button {
   position: fixed;
   background: #444;
@@ -28,7 +29,7 @@ html, body {
   font-size: 14px;
 }
 
-/* Specific positions */
+/* Individual button placement */
 #resetViewBtn {
   bottom: 20px;
   left: 20px;
@@ -67,17 +68,17 @@ html, body {
   display: none;
 }
 
-/* 📱 Mobile Optimization */
+/* Responsive behavior for small screens */
 @media (max-width: 600px) {
   .ui-button {
-    left: 50% !important;
-    transform: translateX(-50%) !important;
     width: 90%;
     max-width: 280px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   #resetViewBtn {
-    bottom: 70px !important;
+    bottom: 80px !important;
   }
 
   #resetSimBtn {
@@ -85,4 +86,16 @@ html, body {
   }
 
   #infoBox {
-    bottom: 140px !i
+    bottom: 150px !important;
+    left: 5% !important;
+    right: 5% !important;
+    max-width: none;
+    font-size: 13px;
+  }
+
+  #clockDisplay {
+    bottom: 190px !important;
+    right: 10px;
+    font-size: 13px;
+  }
+}
