@@ -1,16 +1,54 @@
+
 html, body {
   margin: 0;
   padding: 0;
-  overflow: hidden;
   height: 100%;
-  background: black;
+  overflow: hidden;
   font-family: Arial, sans-serif;
+  background-color: black;
   color: white;
 }
+
 #container {
   width: 100vw;
   height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Ensure buttons and info box scale well on mobile */
+@media (max-width: 600px) {
+  .ui-button {
+    position: fixed;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90%;
+    max-width: 280px;
+    text-align: center;
+  }
+
+  #resetViewBtn {
+    bottom: 20px !important;
+  }
+
+  #resetSimBtn {
+    bottom: 80px !important;
+  }
+
+  #infoBox {
+    bottom: 140px !important;
+    left: 10px !important;
+    right: 10px !important;
+    max-width: none;
+    font-size: 14px;
+  }
+
+  #clockDisplay {
+    bottom: 160px !important;
+    right: 10px !important;
+    font-size: 14px;
+  }
 }
