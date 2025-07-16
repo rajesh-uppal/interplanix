@@ -1,4 +1,4 @@
-// Interplanix Solar System Simulation FINAL (Mobile Optimized)
+// Interplanix Solar System Simulation FINAL — compact time, mobile clean
 console.log("✅ FINAL SIMULATION LOADED");
 
 let scene = new THREE.Scene();
@@ -9,10 +9,10 @@ document.getElementById('container').appendChild(renderer.domElement);
 
 let timeDays = 0;
 
-// Clock Display
+// Clock Display (shortened)
 const clockDisplay = document.createElement('div');
 clockDisplay.id = "clockDisplay";
-clockDisplay.innerText = "🕒 Sim Time: 0 Earth days";
+clockDisplay.innerText = "🕒 0d";
 document.body.appendChild(clockDisplay);
 
 // Info box
@@ -68,7 +68,6 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
-// Label function
 function createLabel(text) {
     const canvas = document.createElement('canvas');
     canvas.width = 512;
@@ -124,11 +123,10 @@ planetData.forEach(data => {
 
 camera.position.z = 40;
 
-// Animation
 function animate() {
     requestAnimationFrame(animate);
     timeDays += 1;
-    clockDisplay.innerText = `🕒 Sim Time: ${timeDays} Earth days`;
+    clockDisplay.innerText = `🕒 ${timeDays}d`;
 
     planets.forEach(p => {
         p.angle += p.speed;
@@ -144,7 +142,7 @@ function animate() {
 }
 animate();
 
-// Click to show info
+// Interactions
 window.addEventListener('click', (event) => {
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
