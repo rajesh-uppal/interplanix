@@ -27,7 +27,7 @@ html, body {
 
 #container {
   width: 100vw;
-  height: calc(100vh - 130px);  /* Reserve space for buttons */
+  height: calc(100vh - 130px);  /* Allows space for UI */
   position: relative;
   overflow: hidden;
   margin-top: 4px;
@@ -83,6 +83,7 @@ html, body {
   display: none;
 }
 
+/* 🌐 Mobile Tweaks */
 @media (max-width: 600px) {
   .sim-header h1 {
     font-size: 20px;
@@ -94,16 +95,16 @@ html, body {
   }
 
   #container {
-    height: calc(100vh - 150px);  /* Shrink canvas more for mobile */
+    height: calc(100vh - 180px);  /* more room for mobile UI */
   }
 
   .ui-button {
     width: 90%;
-    max-width: 260px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    max-width: 240px;
     padding: 6px 10px;
     font-size: 12px;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
   }
 
   #resetViewBtn {
@@ -115,7 +116,7 @@ html, body {
   }
 
   #infoBox {
-    bottom: 120px !important;
+    bottom: 90px !important;
     left: 5% !important;
     right: 5% !important;
     max-width: none;
@@ -123,8 +124,8 @@ html, body {
   }
 
   #clockDisplay {
-    bottom: 160px !important;
+    bottom: 130px !important;
     right: 10px;
-    font-size: 13px;
+    font-size: 12px;
   }
 }
