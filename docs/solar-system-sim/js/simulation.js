@@ -1,5 +1,6 @@
-// Interplanix Solar System Simulation FINAL with readable labels & click info
-console.log("✅ FINAL SIMULATION WITH LABELS & INFO");
+
+// Interplanix Solar System Simulation v22 - Proportional labels for desktop & mobile
+console.log("✅ SIMULATION v22 LOADED");
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -63,20 +64,21 @@ let planets = [];
 let raycaster = new THREE.Raycaster();
 let mouse = new THREE.Vector2();
 
-function createLabel(text) {
+function createLabel(text, size = 1) {
   const isMobile = window.innerWidth <= 600;
+  const baseFontSize = isMobile ? 32 : 48;
+  const fontSize = baseFontSize;
+  const scaleMultiplier = isMobile ? 2.5 : 3.5;
 
-  const fontSize = isMobile ? 28 : 64;
-  const padding = 20;
-  const textWidth = text.length * fontSize * 0.6;
-  const canvasWidth = textWidth + padding * 2;
-  const canvasHeight = fontSize + padding * 2;
+  const canvasWidth = text.length * fontSize * 0.6 + 40;
+  const canvasHeight = fontSize + 40;
 
   const canvas = document.createElement('canvas');
-  canvas.width = canvasWidth;
-  canvas.height = canvasHeight;
+  canvas.width = canvasWidth * 2;
+  canvas.height = canvasHeight * 2;
 
   const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
   ctx.font = `bold ${fontSize}px Arial`;
@@ -88,13 +90,13 @@ function createLabel(text) {
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.SpriteMaterial({ map: texture });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(isMobile ? 4 : 8, isMobile ? 1.2 : 2.5, 1);
+
+  const scale = scaleMultiplier * size;
+  sprite.scale.set(scale, scale * 0.4, 1);
   return sprite;
 }
 
-
-// Add Sun label
-const sunLabel = createLabel("Sun");
+const sunLabel = createLabel("Sun", 4);
 sunLabel.position.set(0, 5, 0);
 sunLabel.userData = {
   name: "Sun",
@@ -104,14 +106,13 @@ sunLabel.userData = {
 };
 scene.add(sunLabel);
 
-// Add planets
 planetData.forEach(data => {
   const geometry = new THREE.SphereGeometry(data.size, 32, 32);
   const material = new THREE.MeshBasicMaterial({ color: data.color });
   const mesh = new THREE.Mesh(geometry, material);
   mesh.position.x = data.dist;
 
-  const label = createLabel(data.name);
+  const label = createLabel(data.name, data.size);
   label.position.set(data.dist, data.size + 0.8, 0);
 
   mesh.userData = data;
