@@ -1,6 +1,5 @@
-
-// Interplanix Solar System Simulation v22 - Proportional labels for desktop & mobile
-console.log("✅ SIMULATION v22 LOADED");
+// Interplanix Solar System Simulation v23 - Final label tuning
+console.log("✅ SIMULATION v23 LOADED");
 
 let scene = new THREE.Scene();
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -31,9 +30,9 @@ resetSimBtn.id = "resetSimBtn";
 resetSimBtn.className = "ui-button";
 resetSimBtn.textContent = "♻️ Reset Simulation";
 resetSimBtn.onclick = () => {
-    timeDays = 0;
-    planets.forEach(p => p.angle = Math.random() * Math.PI * 2);
-    infoBox.style.display = "none";
+  timeDays = 0;
+  planets.forEach(p => p.angle = Math.random() * Math.PI * 2);
+  infoBox.style.display = "none";
 };
 document.body.appendChild(resetSimBtn);
 
@@ -44,11 +43,12 @@ if (window.innerWidth < 600) {
 }
 
 const sun = new THREE.Mesh(
-    new THREE.SphereGeometry(4, 32, 32),
-    new THREE.MeshBasicMaterial({ color: 0xffe066 })
+  new THREE.SphereGeometry(4, 32, 32),
+  new THREE.MeshBasicMaterial({ color: 0xffe066 })
 );
 scene.add(sun);
 
+// 🌍 Planet data
 const planetData = [
   { name: 'Mercury', color: 0xaaaaaa, dist: 4, size: 0.4, speed: 0.04, orbit: 88, moons: 0 },
   { name: 'Venus', color: 0xffaa00, dist: 6, size: 0.6, speed: 0.015, orbit: 225, moons: 0 },
@@ -67,11 +67,13 @@ let mouse = new THREE.Vector2();
 function createLabel(text, size = 1) {
   const isMobile = window.innerWidth <= 600;
   const baseFontSize = isMobile ? 32 : 48;
-  const fontSize = baseFontSize;
-  const scaleMultiplier = isMobile ? 2.5 : 3.5;
 
-  const canvasWidth = text.length * fontSize * 0.6 + 40;
-  const canvasHeight = fontSize + 40;
+  const minScale = isMobile ? 2.5 : 3.0;
+  const maxScale = isMobile ? 4.5 : 6.5;
+  const scale = Math.min(maxScale, Math.max(minScale, size * (isMobile ? 6 : 8)));
+
+  const canvasWidth = text.length * baseFontSize * 0.6 + 40;
+  const canvasHeight = baseFontSize + 40;
 
   const canvas = document.createElement('canvas');
   canvas.width = canvasWidth * 2;
@@ -81,7 +83,7 @@ function createLabel(text, size = 1) {
   ctx.scale(2, 2);
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-  ctx.font = `bold ${fontSize}px Arial`;
+  ctx.font = `bold ${baseFontSize}px Arial`;
   ctx.fillStyle = 'white';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
@@ -90,8 +92,6 @@ function createLabel(text, size = 1) {
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.SpriteMaterial({ map: texture });
   const sprite = new THREE.Sprite(material);
-
-  const scale = scaleMultiplier * size;
   sprite.scale.set(scale, scale * 0.4, 1);
   return sprite;
 }
@@ -152,9 +152,9 @@ function animate() {
 }
 animate();
 
-window.addEventListener('click', (event) => {
+window.addEventListener("click", event => {
   mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-  mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+  mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
   raycaster.setFromCamera(mouse, camera);
   const intersects = raycaster.intersectObjects(
     planets.map(p => p.mesh).concat(planets.map(p => p.label)).concat([sunLabel])
@@ -166,9 +166,9 @@ window.addEventListener('click', (event) => {
                            Distance from Sun: ${data.dist} AU<br>
                            Orbital Period: ${data.orbit} days<br>
                            Moons: ${data.moons}`;
-      infoBox.style.display = 'block';
+      infoBox.style.display = "block";
     }
   } else {
-    infoBox.style.display = 'none';
+    infoBox.style.display = "none";
   }
 });
