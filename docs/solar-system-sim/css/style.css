@@ -8,22 +8,16 @@ html, body {
   color: white;
 }
 
-#container {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
 .sim-header {
   text-align: center;
   color: white;
-  margin-top: 10px;
+  margin: 0;
+  padding: 8px 0;
 }
 
 .sim-header h1 {
   font-size: 28px;
-  margin: 8px 0;
+  margin: 6px 0;
 }
 
 .sim-header p {
@@ -31,7 +25,14 @@ html, body {
   margin: 4px 8px;
 }
 
-/* Base UI button style */
+#container {
+  width: 100vw;
+  height: calc(100vh - 130px);  /* Reserve space for buttons */
+  position: relative;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
 .ui-button {
   position: fixed;
   background: #444;
@@ -82,7 +83,6 @@ html, body {
   display: none;
 }
 
-/* Mobile view */
 @media (max-width: 600px) {
   .sim-header h1 {
     font-size: 20px;
@@ -91,6 +91,10 @@ html, body {
 
   .sim-header p {
     display: none;
+  }
+
+  #container {
+    height: calc(100vh - 150px);  /* Shrink canvas more for mobile */
   }
 
   .ui-button {
