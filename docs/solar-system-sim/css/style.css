@@ -16,6 +16,22 @@ html, body {
   overflow: hidden;
 }
 
+.sim-header {
+  text-align: center;
+  color: white;
+  margin-top: 10px;
+}
+
+.sim-header h1 {
+  font-size: 28px;
+  margin: 8px 0;
+}
+
+.sim-header p {
+  font-size: 16px;
+  margin: 4px 8px;
+}
+
 /* Base UI button style */
 .ui-button {
   position: fixed;
@@ -70,11 +86,23 @@ html, body {
 
 /* Responsive behavior for small screens */
 @media (max-width: 600px) {
+  .sim-header h1 {
+    font-size: 20px;
+    margin: 4px 0;
+  }
+
+  .sim-header p {
+    font-size: 13px;
+    margin: 4px 8px;
+  }
+
   .ui-button {
     width: 90%;
     max-width: 280px;
     left: 50% !important;
     transform: translateX(-50%) !important;
+    padding: 8px 12px;
+    font-size: 13px;
   }
 
   #resetViewBtn {
