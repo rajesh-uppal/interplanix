@@ -65,20 +65,25 @@ let mouse = new THREE.Vector2();
 
 function createLabel(text) {
   const canvas = document.createElement('canvas');
-  canvas.width = 1024;
-  canvas.height = 256;
+  const isMobile = window.innerWidth <= 600;
+
+  canvas.width = isMobile ? 512 : 1024;
+  canvas.height = isMobile ? 128 : 256;
+
   const ctx = canvas.getContext('2d');
   ctx.fillStyle = 'black';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.font = 'bold 64px Arial';
+  ctx.font = isMobile ? 'bold 28px Arial' : 'bold 64px Arial';
   ctx.fillStyle = 'white';
-  ctx.fillText(text, 40, 150);
+  ctx.fillText(text, 30, isMobile ? 80 : 150);
+
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.SpriteMaterial({ map: texture });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(8, 2.5, 1);
+  sprite.scale.set(isMobile ? 4 : 8, isMobile ? 1.2 : 2.5, 1);
   return sprite;
 }
+
 
 // Add Sun label
 const sunLabel = createLabel("Sun");
