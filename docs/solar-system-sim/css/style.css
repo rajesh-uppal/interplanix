@@ -1,3 +1,4 @@
+
 html, body {
   margin: 0;
   padding: 0;
@@ -10,14 +11,12 @@ html, body {
 
 .sim-header {
   text-align: center;
-  color: white;
-  margin: 0;
-  padding: 8px 0;
+  padding: 6px 0;
 }
 
 .sim-header h1 {
   font-size: 28px;
-  margin: 6px 0;
+  margin: 4px 0;
 }
 
 .sim-header p {
@@ -27,10 +26,10 @@ html, body {
 
 #container {
   width: 100vw;
-  height: calc(100vh - 130px);  /* Allows space for UI */
-  position: relative;
+  height: calc(100vh - 100px);
   overflow: hidden;
-  margin-top: 4px;
+  position: relative;
+  margin: 0 auto;
 }
 
 .ui-button {
@@ -72,60 +71,37 @@ html, body {
 #infoBox {
   position: fixed;
   bottom: 80px;
-  left: 20px;
+  left: 10px;
+  right: 10px;
   background: rgba(0,0,0,0.85);
   color: white;
   padding: 10px;
   border-radius: 8px;
   font-size: 14px;
-  max-width: 240px;
   z-index: 9999;
   display: none;
 }
 
-/* 🌐 Mobile Tweaks */
 @media (max-width: 600px) {
   .sim-header h1 {
     font-size: 20px;
     margin: 2px 0;
   }
 
-  .sim-header p {
-    display: none;
-  }
-
-  #container {
-    height: calc(100vh - 180px);  /* more room for mobile UI */
-  }
-
-  .ui-button {
-    width: 90%;
-    max-width: 240px;
-    padding: 6px 10px;
-    font-size: 12px;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-  }
-
-  #resetViewBtn {
+  .sim-header p,
+  .ui-button,
+  #infoBox {
     display: none !important;
   }
 
-  #resetSimBtn {
-    bottom: 20px !important;
-  }
-
-  #infoBox {
-    bottom: 90px !important;
-    left: 5% !important;
-    right: 5% !important;
-    max-width: none;
-    font-size: 13px;
+  #container {
+    height: calc(100vh - 60px);
   }
 
   #clockDisplay {
-    bottom: 130px !important;
-    right: 10px;
+    left: 50% !important;
+    transform: translateX(-50%);
+    bottom: 10px !important;
     font-size: 12px;
   }
 }
