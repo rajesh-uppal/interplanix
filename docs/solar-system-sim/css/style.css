@@ -1,4 +1,3 @@
-
 html, body {
   margin: 0;
   padding: 0;
@@ -26,10 +25,12 @@ html, body {
 
 #container {
   width: 100vw;
-  height: calc(100vh - 100px);
+  height: calc(100vh - 80px); /* more room below */
   overflow: hidden;
   position: relative;
-  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .ui-button {
@@ -58,13 +59,14 @@ html, body {
 
 #clockDisplay {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   background: rgba(255,255,255,0.12);
   color: white;
-  padding: 8px 12px;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
   z-index: 9999;
 }
 
@@ -99,8 +101,6 @@ html, body {
   }
 
   #clockDisplay {
-    left: 50% !important;
-    transform: translateX(-50%);
     bottom: 10px !important;
     font-size: 12px;
   }
