@@ -1,34 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="🌌 A 3D solar system simulation by Interplanix. Explore planetary orbits, sizes, speeds, and rotations with interactive visualization." />
+  <meta charset="UTF-8">
   <title>🌞 Interplanix Solar System Simulation</title>
-
-  <link rel="stylesheet" href="css/style.css" />
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-
-  <!-- Social preview (optional) -->
-  <meta property="og:title" content="Interplanix Solar System Simulation" />
-  <meta property="og:description" content="Interactive simulation of the solar system using 3D visualization." />
-  <meta property="og:type" content="website" />
-  <meta property="og:image" content="https://rajesh-uppal.github.io/interplanix/solar-system-sim/preview.png" />
-  <meta property="og:url" content="https://rajesh-uppal.github.io/interplanix/solar-system-sim/" />
-
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
-<script src="js/simulation.js?v=8" defer></script>
-
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A 3D simulation of the solar system by Interplanix, showing planet rotation, scale, and orbit visualization.">
+  <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
-  <div style="text-align: center; margin-top: 1em;">
+  <div class="sim-header">
     <h1>🌌 Interplanix Solar System</h1>
-    <p>Observe planetary orbits, rotations, and sizes relative to Each Other. Click planets for info.</p>
+    <p>Observe planetary orbits, rotations, and sizes relative to the Sun. Click planets for info.</p>
   </div>
-
-  <div id="container" style="background-color: black; height: 100vh;"></div>
+  <div id="container"></div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="js/simulation.js?v=12" defer></script>
 </body>
 </html>
