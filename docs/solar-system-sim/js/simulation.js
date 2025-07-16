@@ -107,8 +107,10 @@ const sun = new THREE.Mesh(
   new THREE.SphereGeometry(4, 32, 32),
   new THREE.MeshBasicMaterial({ color: 0xffdd55 })
 );
+sun.position.y = 2.5;  // ⬅️ Move Sun slightly up
 sun.userData = { name: "Sun" };
 scene.add(sun);
+
 
 const planetData = [
   { name: "Mercury", color: 0xaaaaaa, dist: 4, size: 0.40, speed: 0.040, orbit: 88, moons: 0 },
@@ -158,8 +160,10 @@ planetData.forEach(d => {
   planets.push({ mesh, label, angle: Math.random() * Math.PI * 2, speed: d.speed, dist: d.dist, size: d.size });
 });
 
-camera.position.z = 35;
-camera.lookAt(0, 0, 0);
+camera.position.set(0, 2.5, 35);
+camera.lookAt(0, 2.5, 0);
+
+
 
 function animate() {
   requestAnimationFrame(animate);
