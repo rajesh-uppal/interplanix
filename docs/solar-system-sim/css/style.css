@@ -25,7 +25,7 @@ html, body {
 
 #container {
   width: 100vw;
-  height: calc(100vh - 80px); /* more room below */
+  height: calc(100vh - 100px);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -84,6 +84,7 @@ html, body {
   display: none;
 }
 
+/* 📱 Mobile layout */
 @media (max-width: 600px) {
   .sim-header h1 {
     font-size: 20px;
@@ -103,5 +104,12 @@ html, body {
   #clockDisplay {
     bottom: 10px !important;
     font-size: 12px;
+  }
+}
+
+/* 🖥 Desktop layout fix: reduce height so simulation moves up */
+@media (min-width: 601px) {
+  #container {
+    height: calc(100vh - 140px);
   }
 }
