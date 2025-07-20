@@ -2,6 +2,21 @@
 console.log("✅ SIMULATION v24 LOADED");
 
 let scene = new THREE.Scene();
+
+// 🌌 Load starfield cube texture background
+const loader = new THREE.CubeTextureLoader();
+const starfield = loader.setPath('assets/starfield/').load([
+  'space_px.png',  // +X
+  'space_nx.png',  // -X
+  'space_py.png',  // +Y
+  'space_ny.png',  // -Y
+  'space_pz.png',  // +Z
+  'space_nz.png'   // -Z
+]);
+scene.background = starfield;
+
+
+
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
