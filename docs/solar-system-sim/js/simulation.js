@@ -1,6 +1,6 @@
 // ✅ Interplanix Solar System Simulation v24
 console.log("✅ SIMULATION v24 LOADED");
-
+const initialCameraPosition = new THREE.Vector3(0, 0, 180);
 let scene = new THREE.Scene();
 
 // 🌌 Load starfield cube texture background
@@ -40,7 +40,10 @@ const resetViewBtn = document.createElement('button');
 resetViewBtn.id = "resetViewBtn";
 resetViewBtn.className = "ui-button";
 resetViewBtn.textContent = "🔄 Reset View";
-resetViewBtn.onclick = () => camera.position.set(0, 0, 60);
+resetViewBtn.onclick = () => {
+  camera.position.copy(initialCameraPosition);
+  camera.lookAt(0, 0, 0);
+};
 document.body.appendChild(resetViewBtn);
 
 const resetSimBtn = document.createElement('button');
