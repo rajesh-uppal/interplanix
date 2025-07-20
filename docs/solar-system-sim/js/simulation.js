@@ -55,30 +55,31 @@ const isMobile = window.innerWidth <= 600;
 
 // 🪐 Planet data
 const planetData = [
-  // 🟣 Mercury – slightly farther & bigger & brighter
-  { name: 'Mercury', color: 0xeeeeff, dist: 24, size: 1.5, speed: 0.04, orbit: 88, moons: 0 },
+  // 🌑 Mercury – size and contrast adjusted, distance slightly increased
+  { name: 'Mercury', color: 0xeeeeff, dist: 28, size: 3.0, speed: 0.04, orbit: 88, moons: 0 },
 
-  // 🟠 Venus – 50% larger
-  { name: 'Venus', color: 0xffaa00, dist: 30, size: 1.8, speed: 0.015, orbit: 225, moons: 0 },
+  // 🌕 Venus
+  { name: 'Venus', color: 0xffaa00, dist: 36, size: 3.6, speed: 0.015, orbit: 225, moons: 0 },
 
-  // 🌍 Earth – 50% larger
-  { name: 'Earth', color: 0x00aaff, dist: 40, size: 2.1, speed: 0.01, orbit: 365, moons: 1 },
+  // 🌍 Earth
+  { name: 'Earth', color: 0x00aaff, dist: 48, size: 4.2, speed: 0.01, orbit: 365, moons: 1 },
 
-  // 🔴 Mars – 50% larger
-  { name: 'Mars', color: 0xff3300, dist: 50, size: 1.8, speed: 0.008, orbit: 687, moons: 2 },
+  // 🔴 Mars
+  { name: 'Mars', color: 0xff3300, dist: 60, size: 3.6, speed: 0.008, orbit: 687, moons: 2 },
 
-  // ⚪ Jupiter – keep as-is
-  { name: 'Jupiter', color: 0xffcc99, dist: 70, size: 3.2, speed: 0.002, orbit: 4333, moons: 95 },
+  // 🟠 Jupiter – reduced distance slightly to fit frame
+  { name: 'Jupiter', color: 0xffcc99, dist: 74, size: 3.2, speed: 0.002, orbit: 4333, moons: 95 },
 
-  // 🟡 Saturn – keep as-is
-  { name: 'Saturn', color: 0xffffcc, dist: 90, size: 2.6, speed: 0.0015, orbit: 10759, moons: 145 },
+  // 🟡 Saturn
+  { name: 'Saturn', color: 0xffffcc, dist: 88, size: 2.6, speed: 0.0015, orbit: 10759, moons: 145 },
 
-  // 🔵 Uranus – keep as-is
-  { name: 'Uranus', color: 0x99ccff, dist: 110, size: 2.2, speed: 0.001, orbit: 30687, moons: 27 },
+  // 🔵 Uranus
+  { name: 'Uranus', color: 0x99ccff, dist: 102, size: 2.2, speed: 0.001, orbit: 30687, moons: 27 },
 
-  // 🔵 Neptune – keep as-is
-  { name: 'Neptune', color: 0x3366ff, dist: 125, size: 2.2, speed: 0.0009, orbit: 60190, moons: 14 }
+  // 🔵 Neptune
+  { name: 'Neptune', color: 0x3366ff, dist: 116, size: 2.2, speed: 0.0009, orbit: 60190, moons: 14 }
 ];
+
 
 
 
@@ -102,7 +103,8 @@ function createLabel(text, size = 1) {
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.SpriteMaterial({ map: texture });
   const sprite = new THREE.Sprite(material);
-  sprite.scale.set(size * 6, size * 2, 1);
+  sprite.scale.set(size * 8, size * 2.5, 1);  // ⬆️ Bigger labels
+
   return sprite;
 }
 
@@ -126,7 +128,7 @@ planetData.forEach(data => {
   });
 });
 
-camera.position.z = 160;
+camera.position.z = 180;
 
 
 // 🌍 Animate the scene
