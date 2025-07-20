@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🪐 Interplanix Solar System Simulation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- ✅ Load the main stylesheet for layout and UI -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <!-- ✅ Load THREE.js for 3D rendering -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+
+  <!-- ✅ Load our main simulation JavaScript file -->
+  <script defer src="js/simulation.js"></script>
+</head>
+<body>
+  
+  <!-- 🖼️ Main WebGL canvas container -->
+  <div id="container"></div>
+
+  <!-- 🪐 Modal for Mars Orbit Simulation Preview -->
+  <div id="marsModal" class="modal">
+    <div class="modal-content">
+
+      <!-- 🚀 IFrame loads the Mars simulation here -->
+      <iframe id="marsFrame" src="" allowfullscreen></iframe>
+
+      <!-- ❌ Close button for modal -->
+      <span class="close" onclick="closeMarsModal()">&times;</span>
+    </div>
+  </div>
+
+  <!-- ✅ Script to control Mars modal behavior -->
+  <script>
+    // 🔘 Open Mars orbit modal when Mars is clicked
+    function openMarsModal() {
+      document.getElementById("marsFrame").src = "../../planet-previews/mars/index.html"; // 📍 Path to Mars sim
+      document.getElementById("marsModal").style.display = "block";
+    }
+
+    // 🔘 Close the Mars modal and clear iframe source
+    function closeMarsModal() {
+      document.getElementById("marsModal").style.display = "none";
+      document.getElementById("marsFrame").src = "";
+    }
+
+    // 🛑 Clicking anywhere outside the modal content closes it
+    window.addEventListener("click", function(event) {
+      const modal = document.getElementById("marsModal");
+      if (event.target === modal) {
+        closeMarsModal();
+      }
+    });
+  </script>
+
+</body>
+</html>

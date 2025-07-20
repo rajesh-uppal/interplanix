@@ -1,0 +1,13 @@
+/* 🎨 Mars Viewer Styles */
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background-color: #000;
+}
+
+/* 🔴 Container where Three.js will render */
+#marsContainer {
+  width: 100vw;
+  height: 100vh;
+}
