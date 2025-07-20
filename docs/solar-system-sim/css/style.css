@@ -1,0 +1,55 @@
+/* 🎨 Interplanix Solar System Styles */
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+  background-color: #000;
+  color: white;
+}
+
+/* 🕒 Clock Display */
+#clockDisplay {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-size: 18px;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 6px 10px;
+  border-radius: 6px;
+  z-index: 2;
+}
+
+/* ℹ️ Info Box */
+#infoBox {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background-color: rgba(30, 30, 30, 0.8);
+  padding: 10px;
+  border: 1px solid #666;
+  border-radius: 8px;
+  display: none;
+  z-index: 2;
+}
+
+/* 🔘 Buttons */
+.ui-button {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background-color: #444;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-left: 10px;
+  z-index: 2;
+}
+#resetSimBtn {
+  right: 16px;
+}
+#resetViewBtn {
+  right: 130px;
+}
