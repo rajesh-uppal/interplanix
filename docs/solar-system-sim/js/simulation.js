@@ -5,14 +5,16 @@ let scene = new THREE.Scene();
 
 // 🌌 Load starfield cube texture background
 const loader = new THREE.CubeTextureLoader();
-const starfield = loader.setPath('solar-system-sim/assets/starfield/').load([
-  'space_px.png',  // +X
-  'space_nx.png',  // -X
-  'space_py.png',  // +Y
-  'space_ny.png',  // -Y
-  'space_pz.png',  // +Z
-  'space_nz.png'   // -Z
-]);
+const starfield = loader
+  .setPath('https://rajesh-uppal.github.io/interplanix/solar-system-sim/assets/starfield/')
+  .load([
+    'space_px.png',
+    'space_nx.png',
+    'space_py.png',
+    'space_ny.png',
+    'space_pz.png',
+    'space_nz.png'
+  ]);
 scene.background = starfield;
 
 
