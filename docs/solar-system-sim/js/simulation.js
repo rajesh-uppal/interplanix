@@ -5,7 +5,7 @@ let scene = new THREE.Scene();
 
 // 🌌 Load starfield cube texture background
 const loader = new THREE.CubeTextureLoader();
-const starfield = loader.setPath('assets/starfield/').load([
+const starfield = loader.setPath('../assets/starfield/').load([
   'space_px.png',  // +X
   'space_nx.png',  // -X
   'space_py.png',  // +Y
