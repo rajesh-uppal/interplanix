@@ -24,6 +24,16 @@ let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.getElementById('container').appendChild(renderer.domElement);
 
+// 🌐 Enable OrbitControls for camera movement
+const controls = new THREE.OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.1;
+controls.zoomSpeed = 0.5;
+controls.rotateSpeed = 0.5;
+controls.target.set(0, 0, 0); // Focus on the Sun
+
+
+
 let timeDays = 0;
 
 // UI Elements: Clock, InfoBox, Reset Buttons
@@ -40,10 +50,13 @@ const resetViewBtn = document.createElement('button');
 resetViewBtn.id = "resetViewBtn";
 resetViewBtn.className = "ui-button";
 resetViewBtn.textContent = "🔄 Reset View";
+
 resetViewBtn.onclick = () => {
-  camera.position.copy(initialCameraPosition);
-  camera.lookAt(0, 0, 0);
+  camera.position.set(0, 0, 180);   // Reset position
+  controls.target.set(0, 0, 0);     // Focus on the Sun
+  controls.update();               // Reapply control changes
 };
+
 document.body.appendChild(resetViewBtn);
 
 const resetSimBtn = document.createElement('button');
@@ -165,10 +178,13 @@ function animate() {
     p.label.position.set(x, p.size + 1, z);
     p.label.lookAt(camera.position);
   });
-
+  
+  controls.update();
   renderer.render(scene, camera);
+
 }
 animate();
+
 
 // 🖱️ Click handler
 window.addEventListener("click", event => {
