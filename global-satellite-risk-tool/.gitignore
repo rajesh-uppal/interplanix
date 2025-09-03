@@ -5,3 +5,10 @@ backups/
 **/.ipynb_checkpoints/
 __pycache__/
 *.pyc
+# ignore generated outputs and backups
+visualizations/risk_maps/*.html
+visualizations/risk_maps/*.csv
+backups/
+**/.ipynb_checkpoints/
+__pycache__/
+*.pyc
